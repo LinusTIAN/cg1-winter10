@@ -4,6 +4,7 @@
 #include <new>
 #include <cstring>
 #include <string>
+#include <assert.h>
 
 using namespace std;
 
@@ -16,6 +17,17 @@ MyTextureManager::~MyTextureManager(void)
 {
 }
 
+int MyTextureManager::nearestPower( int value )
+{
+    int i = 1;
+
+    if (value == 0) return -1;      /* Error! */
+    for (;;) {
+         if (value == 1) return i;
+         else if (value == 3) return i*4;
+         value >>= 1; i *= 2;
+    }
+}
 
 
 int MyTextureManager::addPTexture(const char *str, bool fullPath){
@@ -52,66 +64,46 @@ int MyTextureManager::addPTexture(const char *str, bool fullPath){
 
 
 int MyTextureManager::setUpTexture(PngWrapper* wrapper){
+	
+	// Read the texture image
+	int imageWidth  = wrapper->GetWidth();
+	int imageHeight = wrapper->GetHeight();
 
-	GLuint texture = 0;
-/*
-	GLubyte*** checkImage = new GLubyte**[wrapper->GetHeight()];//[wrapper->GetWidth()][4];
-	for(int i=0; i<wrapper->GetHeight(); i++){
-		checkImage[i] = new GLubyte*[wrapper->GetWidth()];
-		for(int j=0; j<wrapper->GetWidth(); j++){
-			checkImage[i][j] = new GLubyte[4];
-		}
-	}*/
-	//TODO!!! arr size!!!
+	GLubyte* checkImage = new GLubyte[imageWidth*imageHeight*4*sizeof(GLubyte)];
 
-	GLubyte checkImage[80][65][4];
-	int imageWidth = 64;
-	int imageHeight = 64;
-
-	/*int i, j, c,color;
-	for (i = 0; i < imageHeight; i++) {
-		for (j = 0; j < imageWidth; j++) {
+	int c,color;
+	for (int i = 0; i < imageHeight; i++) {
+		for (int j = 0; j < imageWidth; j++) {
 			color = wrapper->GetValue(j,i);
-			checkImage[i][j][0] = (GLubyte)  GET_R(color);
-			checkImage[i][j][1] = (GLubyte)  GET_G(color);
-			checkImage[i][j][2] = (GLubyte)  GET_B(color);
-			checkImage[i][j][3] = (GLubyte) 255;
-	  }
-	}*/
-
-	/*int i, j, c,color;
-	for (i = 0; i < imageHeight; i++) {
-		for (j = 0; j < imageWidth; j++) {
-			checkImage[i][j][0] = (GLubyte)  0;
-			checkImage[i][j][1] = (GLubyte)  0;
-			checkImage[i][j][2] = (GLubyte)  255;
-			checkImage[i][j][3] = (GLubyte) 255;
-			if (i%2==0  ){
-				checkImage[i][j][0] = (GLubyte)  255;
-				checkImage[i][j][2] = (GLubyte)  0;
+			if(i*imageWidth*4 + j*4 +3 < imageWidth*imageHeight*4){
+				checkImage[i*imageWidth*4 + j*4 +0] = (GLubyte)  GET_R(color);
+				checkImage[i*imageWidth*4 + j*4 +1] = (GLubyte)  GET_G(color);
+				checkImage[i*imageWidth*4 + j*4 +2] = (GLubyte)  GET_B(color);
+				checkImage[i*imageWidth*4 + j*4 +3] = (GLubyte) 255;
 			}
-
-			if (j%8==0 ){
-				checkImage[i][j][0] = (GLubyte)  0;
-				checkImage[i][j][1] = (GLubyte)  255;
-				checkImage[i][j][2] = (GLubyte)  0;
-			}
+			else
+				assert (0);
 	  }
-	}*/
+	}
 
-	int i, j, c;
+	//Scale the image
+    GLubyte *sImage;
     
-   for (i = 0; i < imageHeight; i++) {
-      for (j = 0; j < imageWidth; j++) {
-         c = ((((i&0x8)==0)^((j&0x8))==0))*255;
-         checkImage[i][j][0] = (GLubyte) c;
-         checkImage[i][j][1] = (GLubyte) c;
-         checkImage[i][j][2] = (GLubyte) c;
-         checkImage[i][j][3] = (GLubyte) 255;
-      }
-   }
+    GLsizei sWidth = nearestPower( imageWidth );
+    GLsizei sHeight = nearestPower( imageHeight );
 
-
+    //scale texture image to 2^m by 2^n if necessary 
+    if ( sWidth == imageWidth && sHeight == imageHeight ) {
+         sImage = (GLubyte *) checkImage;
+    } else {
+         sImage = (GLubyte *)malloc( sHeight*sWidth*4*sizeof( GLubyte ) );
+         gluScaleImage( GL_RGBA, imageWidth, imageHeight, 
+                        GL_UNSIGNED_BYTE, checkImage,
+                        sWidth, sHeight, GL_UNSIGNED_BYTE, sImage );
+    }
+	
+	// Define texture
+	GLuint texture = 0;
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -120,9 +112,9 @@ int MyTextureManager::setUpTexture(PngWrapper* wrapper){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,   GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,   GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, imageWidth, 
-						imageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
-						checkImage);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, sWidth, 
+						sHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
+						sImage);
 
 	return texture;
 }

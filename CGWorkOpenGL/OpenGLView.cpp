@@ -422,8 +422,7 @@ void COpenGLView::OnDraw(CDC* pDC)
 	COpenGLDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
-	
-	setupLightInScene(false);
+	setupLightInScene();
 
 	if (m_nLightShading == ID_LIGHT_SHADING_FLAT){
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -899,7 +898,6 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 		glPopMatrix();
 		glPushMatrix();
 		
-		setupLightInScene(true);
 
 		switch (m_nAction)
 		{
@@ -920,7 +918,6 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 			break;
 		}
 
-		setupLightInScene(false);
 
 		mustRedraw = true;
 	}
@@ -1346,7 +1343,7 @@ void COpenGLView::lightReset(){
 
 	m_lights[0].space = LIGHT_SPACE_VIEW;
 	
-	setupLightInScene(true);
+	setupLightInScene();
 
 	for (int id=LIGHT_ID_1;id<MAX_LIGHT;id++)
 	{	    
@@ -1359,19 +1356,31 @@ void COpenGLView::lightReset(){
 
 
 
-void COpenGLView::setupLightInScene(bool isView){
-	if (isView)
-	{
-		m_lightManager.setupGeneralLight(	(!torchEnabled) && 
-											(s_fileData != NULL) && 
-											(m_nLightShading != ID_SHADING_WIREFRAME),
-											m_ambientLight);
-	}
+void COpenGLView::setupLightInScene(){
+
+	//Enable view lights 
+	GLdouble currentMatrix[16];
+	glGetDoublev(GL_MODELVIEW_MATRIX, &currentMatrix[0]);
+	glLoadIdentity();
+
+	m_lightManager.setupGeneralLight(	(!torchEnabled) && 
+									(s_fileData != NULL) && 
+									(m_nLightShading != ID_SHADING_WIREFRAME),
+									m_ambientLight);
 	for (int i=0;i<MAX_LIGHT; i++ ){
-		if ((m_lights[i].space == LIGHT_SPACE_VIEW && isView)||
-			(m_lights[i].space == LIGHT_SPACE_LOCAL && (!isView)))
+		if (m_lights[i].space == LIGHT_SPACE_VIEW)
 			m_lightManager.showLight(m_lights[i], i);
 	}
+
+	glMultMatrixd(&currentMatrix[0]);
+
+
+	//Enable local lights 
+	for (int i=0;i<MAX_LIGHT; i++ ){
+		if (m_lights[i].space == LIGHT_SPACE_LOCAL)
+			m_lightManager.showLight(m_lights[i], i);
+	}
+	
 }
 void COpenGLView::OnMaterialLoadtexture()
 {
