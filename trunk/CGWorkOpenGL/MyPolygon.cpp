@@ -47,65 +47,56 @@ void MyPolygon::Draw(void)
 
 	glBegin(GL_POLYGON);
 	
-		for (int i=0; i < nextVertex; i++)
+	for (int i=0; i < nextVertex; i++)
+	{
+		if (torchEnabled)
 		{
-			if (torchEnabled)
-			{
-				// find the distance of the point from mouse cursor and set the color accordingly
-				double	dx = m_vertices[i].x - cursor_x,
-						dy = m_vertices[i].y - cursor_y,
-						dz = m_vertices[i].z - cursor_z,
-						d = sqrt(dx*dx + dy*dy + dz*dz),
-						shade = 1 - (d/torch_range);
+			// find the distance of the point from mouse cursor and set the color accordingly
+			double	dx = m_vertices[i].x - cursor_x,
+					dy = m_vertices[i].y - cursor_y,
+					dz = m_vertices[i].z - cursor_z,
+					d = sqrt(dx*dx + dy*dy + dz*dz),
+					shade = 1 - (d/torch_range);
 
-				if (shade < 0.1)//was 0.035
-					shade = 0.1;	// maintain /some/ ambient light...
+			if (shade < 0.1)//was 0.035
+				shade = 0.1;	// maintain /some/ ambient light...
 
-				glColor3d(shade, shade, shade);
-			}
-
-			GLfloat norm[3]; 
-			
-			norm[0] = m_vertices[i].normal.m_x;
-			norm[1] = m_vertices[i].normal.m_y;
-			norm[2] = m_vertices[i].normal.m_z;
-
-			if (norm[0]==0 &&norm[1]==0 && norm[2]==0){
-				assert(0);
-			}
-
-			if (m_showTexture){
-				if (i==0)
-					glTexCoord2f(0.0, 0.0);
-				else if (i==1)
-					glTexCoord2f(0.0, 1.0);
-				else if (i==2)
-					glTexCoord2f(1.0, 1.0);
-				else if (i==3)
-					glTexCoord2f(1.0, 0.0);
-			}
-			glNormal3fv(norm);
-			glVertex3d(m_vertices[i].x, m_vertices[i].y, m_vertices[i].z);
+			glColor3d(shade, shade, shade);
 		}
 
+		//Draw texture		
+		if (m_showTexture){
+			//if (nextVertex !=4)
+			//	assert(0);
+			if (i==0)
+				glTexCoord2f(0.0, 0.0);
+			else if (i==1)
+				glTexCoord2f(1.0, 0.0);
+			else if (i==2)
+				glTexCoord2f(1.0, 1.0);
+			else if (i==3)
+				glTexCoord2f(0.0, 1.0);
+		}
+		
+		//Draw normal
+		GLfloat norm[3]; 
+		
+		norm[0] = m_vertices[i].normal.m_x;
+		norm[1] = m_vertices[i].normal.m_y;
+		norm[2] = m_vertices[i].normal.m_z;
 
+		if (norm[0]==0 &&norm[1]==0 && norm[2]==0){
+			assert(0);
+		}
+		glNormal3fv(norm);
 
-	//glBegin(GL_QUADS);
-
-   //glTexCoord2f(0.0, 0.0); glVertex3f(-0.1, -0.1, 0.0);
-   //glTexCoord2f(0.0, 1.0); glVertex3f(-0.1, 0.1, 0.0);
-   //glTexCoord2f(1.0, 1.0); glVertex3f(0.0, 0.5, 0.0);
-   //glTexCoord2f(1.0, 0.0); glVertex3f(0.0, -0.5, 0.0);
-
-   //glTexCoord2f(0.0, 0.0); glVertex3f(1.0, -1.0, 0.0);
-   //glTexCoord2f(0.0, 1.0); glVertex3f(1.0, 1.0, 0.0);
-   //glTexCoord2f(1.0, 1.0); glVertex3f(0.41421, 1.0, -0.41421);
-   //glTexCoord2f(1.0, 0.0); glVertex3f(0.41421, -1.0, -0.41421);
-
+		//Draw vertex
+		glVertex3d(m_vertices[i].x, m_vertices[i].y, m_vertices[i].z);
+	}
 
 	glEnd();
 
-	glFlush();
+	//glFlush();
    glDisable(GL_TEXTURE_2D);
 
 }

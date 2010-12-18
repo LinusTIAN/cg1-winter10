@@ -105,7 +105,7 @@ private:
 	void draw_axis();
 	void scaleAccordingToAxis(double scale_amt);
 	void lightReset();
-	void setupLightInScene(bool isView);
+	void setupLightInScene();
 
 
 // Generated message map functions
