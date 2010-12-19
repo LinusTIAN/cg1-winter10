@@ -39,7 +39,7 @@ void MyPolygon::Draw(void)
 {
 	if (m_showTexture){
 		glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);//GL_DECAL);
 		glBindTexture(GL_TEXTURE_2D,m_texture);
 	}
 	else{

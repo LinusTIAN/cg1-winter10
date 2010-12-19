@@ -149,6 +149,8 @@ COpenGLView::COpenGLView()
 
 	//init the first light to be enabled
 	m_lights[LIGHT_ID_1].enabled=true;
+
+	lightReset();
 }
 
 COpenGLView::~COpenGLView()
@@ -1122,13 +1124,13 @@ bool COpenGLView::SetupCamera(bool resetTransforms)
 	if (m_bIsPerspective)
 	{
 		ret = SetupViewingFrustum();
-		glMatrixMode(GL_MODELVIEW);
 	}
 	else
 	{
 		ret = SetupViewingOrthoConstAspect();
-		glMatrixMode(GL_MODELVIEW);
 	}
+		
+	glMatrixMode(GL_MODELVIEW);
 
 	if (!ret)
 		return ret;
@@ -1352,7 +1354,7 @@ void COpenGLView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void COpenGLView::OnFileReset()
 {
-	lightReset();
+	//lightReset();
 	if (s_fileData != NULL){
 		m_backgroundColor[0] = m_backgroundColor[1] = m_backgroundColor[2] = 0;
 		// reset the ModelView matrix
