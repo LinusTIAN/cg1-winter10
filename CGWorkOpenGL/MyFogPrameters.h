@@ -13,6 +13,9 @@ public:
 	MyFogPrameters(void);
 	~MyFogPrameters(void);
 
+	void setupFog();
+
+public:
 	bool enabled;
 
 	int m_r;

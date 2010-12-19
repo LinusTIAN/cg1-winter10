@@ -18,8 +18,6 @@ void MyLight::setupGeneralLight(bool show, LightParams& params ){
 
 	m_params = params;
 
-	GLfloat mat_shininess[] = { 0.0 };
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
 
 	glEnable(GL_LIGHTING); 
 	glEnable(GL_DEPTH_TEST);
@@ -30,10 +28,6 @@ void MyLight::setupGeneralLight(bool show, LightParams& params ){
 	GLfloat lmodel_ambient[] = { m_params.colorR/255.0, m_params.colorG/255.0, m_params.colorB/255.0, 1.0 };
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
 
-	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-	GLfloat low_shininess[] = { 50.0 };
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, low_shininess);
 }
 
 

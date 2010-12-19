@@ -141,6 +141,7 @@ BEGIN
     POPUP "&Material"
     BEGIN
         MENUITEM "&Load Texture...",            ID_MATERIAL_LOADTEXTURE
+        MENUITEM "&Properties...",              ID_MATERIAL_PROPERTIES
     END
     POPUP "&Help"
     BEGIN

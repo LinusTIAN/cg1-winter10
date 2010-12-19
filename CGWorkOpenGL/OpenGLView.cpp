@@ -16,6 +16,7 @@ using std::endl;
 
 #include "MouseSensitivityDialog.h"
 #include "PerspectiveOptionsDialog.h"
+#include "MaterialDlg.h"
 #include "FogDialog.h"
 
 #include "globals.h"
@@ -106,6 +107,7 @@ BEGIN_MESSAGE_MAP(COpenGLView, CView)
 	ON_COMMAND(ID_OPTIONS_BACKFACESCULLING, &COpenGLView::OnOptionsBackfacesculling)
 	ON_UPDATE_COMMAND_UI(ID_OPTIONS_BACKFACESCULLING, &COpenGLView::OnUpdateOptionsBackfacesculling)
 	ON_COMMAND(ID_LIGHT_FOG, &COpenGLView::OnLightFog)
+	ON_COMMAND(ID_MATERIAL_PROPERTIES, &COpenGLView::OnMaterialProperties)
 END_MESSAGE_MAP()
 
 
@@ -142,10 +144,6 @@ COpenGLView::COpenGLView()
 
 	m_nLightShading = ID_LIGHT_SHADING_FLAT;
 
-	m_lMaterialAmbient = 0.2;
-	m_lMaterialDiffuse = 0.8;
-	m_lMaterialSpecular = 1.0;
-	m_nMaterialCosineFactor = 32;
 
 	//init the first light to be enabled
 	m_lights[LIGHT_ID_1].enabled=true;
@@ -429,6 +427,8 @@ void COpenGLView::OnDraw(CDC* pDC)
 
 	// Light
 	setupLightInScene();
+	m_fogFarams.setupFog();
+	m_materialManager.setupMaterialInScene();
 
 	// Shading
 	if (m_nLightShading == ID_LIGHT_SHADING_FLAT){
@@ -1395,42 +1395,7 @@ void COpenGLView::setupLightInScene(){
 	for (int i=0;i<MAX_LIGHT; i++ ){
 		if (m_lights[i].space == LIGHT_SPACE_LOCAL)
 			m_lightManager.showLight(m_lights[i], i);
-	}
-
-
-	if (m_fogFarams.enabled)
-   {
-		glEnable(GL_FOG);
-		GLfloat fogColor[4] = {	m_fogFarams.m_r / 255.0, 
-								m_fogFarams.m_g / 255.0, 
-								m_fogFarams.m_b / 255.0, 
-								1.0};
-
-		GLint fogMode = GL_EXP;
-		
-		switch (m_fogFarams.m_type){
-			case FOG_GL_EXP:
-				fogMode = GL_EXP;
-				break;
-			case FOG_GL_EXP2:
-				fogMode = GL_EXP2;
-				break;
-			case FOG_GL_LINEAR:
-				fogMode = GL_LINEAR;
-				break;
-		}
-		glFogi (GL_FOG_MODE, fogMode);
-		glFogfv (GL_FOG_COLOR, fogColor);
-		glFogf (GL_FOG_DENSITY, m_fogFarams.m_density);
-		glHint (GL_FOG_HINT, GL_DONT_CARE);
-		glFogf (GL_FOG_START, 1.0);
-		glFogf (GL_FOG_END, 5.0);
-   }
-	else{
-		glDisable(GL_FOG);
-	}
-
-	
+	}	
 }
 void COpenGLView::OnMaterialLoadtexture()
 {
@@ -1465,6 +1430,15 @@ void COpenGLView::OnLightFog()
 	CFogDialog dlg(m_fogFarams);
 	if (dlg.DoModal () == IDOK) {
 		m_fogFarams = dlg.getFogParams();
+		Invalidate();
+	}
+}
+
+void COpenGLView::OnMaterialProperties()
+{
+	CMaterialDlg dlg(m_materialManager);
+	if (dlg.DoModal () == IDOK) {
+		m_materialManager = dlg.getMaterialManager();
 		Invalidate();
 	}
 }
