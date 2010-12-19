@@ -12,12 +12,49 @@ IMPLEMENT_DYNAMIC(CMaterialDlg, CDialog)
 
 CMaterialDlg::CMaterialDlg(MyMaterialManager& materialManager, CWnd* pParent /*=NULL*/)
 	: CDialog(CMaterialDlg::IDD, pParent)
-	, m_ambient(materialManager.m_ambient)
-	, m_diffuse(materialManager.m_diffuse)
-	, m_shininess(materialManager.m_shininess)
-	, m_specular(materialManager.m_specular)
+	, m_sWrap(_T(""))
+	, m_tWrap(_T(""))
+	, m_sAuto(materialManager.m_sAuto)
+	, m_tAuto(materialManager.m_tAuto)
+	, m_sType(_T(""))
+	, m_tType(_T(""))
 {
 	m_materialManager = materialManager;
+	
+	if ( materialManager.m_sRepeat)
+		m_sWrap = "GL_REPEAT";
+	else
+		m_sWrap = "GL_CLAMP";
+	
+	if ( materialManager.m_tRepeat)
+		m_tWrap = "GL_REPEAT";
+	else
+		m_tWrap = "GL_CLAMP";
+
+	switch(materialManager.m_sType){
+	case  1:
+		m_sType = "Eye Linier";
+		break;
+	case 2:
+		m_sType = "Object Linier";
+		break;
+	default:
+		m_sType = "Sphere Map;";
+		break;
+	}
+
+	
+	switch(materialManager.m_tType){
+	case  1:
+		m_tType = "Eye Linier";
+		break;
+	case 2:
+		m_tType = "Object Linier";
+		break;
+	default:
+		m_tType = "Sphere Map;";
+		break;
+	}
 }
 
 CMaterialDlg::~CMaterialDlg()
@@ -26,26 +63,69 @@ CMaterialDlg::~CMaterialDlg()
 
 void CMaterialDlg::DoDataExchange(CDataExchange* pDX)
 {
-    CDialog::DoDataExchange(pDX);
-    DDX_Text(pDX, IDC_MATERIAL_AMBIENT, m_ambient);
-    DDV_MinMaxDouble(pDX, m_ambient, 0, 1);
-    DDX_Text(pDX, IDC_MATERIAL_DIFFUSE, m_diffuse);
-    DDV_MinMaxDouble(pDX, m_diffuse, 0, 1);
-    DDX_Text(pDX, IDC_MATERIAL_SPECULAR, m_specular);
-	DDV_MinMaxDouble(pDX, m_specular, 0, 1);
+	CDialog::DoDataExchange(pDX);
+	DDX_Text(pDX, IDC_MATERIAL_AMBIENT, m_materialManager.m_ambient);
+	DDV_MinMaxDouble(pDX, m_materialManager.m_ambient, 0, 1);
+	DDX_Text(pDX, IDC_MATERIAL_DIFFUSE,m_materialManager. m_diffuse);
+	DDV_MinMaxDouble(pDX, m_materialManager.m_diffuse, 0, 1);
+	DDX_Text(pDX, IDC_MATERIAL_SPECULAR, m_materialManager.m_specular);
+	DDV_MinMaxDouble(pDX, m_materialManager.m_specular, 0, 1);
 
-    DDX_Text(pDX, IDC_MATERIAL_SHININESS, m_shininess);
-	DDV_MinMaxInt(pDX, m_shininess, 0, 128);
+	DDX_Text(pDX, IDC_MATERIAL_SHININESS, m_materialManager.m_shininess);
+	DDV_MinMaxInt(pDX, m_materialManager.m_shininess, 0, 128);
+
+	DDX_CBString(pDX, IDC_COMBO1, m_sWrap);
+	DDX_CBString(pDX, IDC_COMBO2, m_tWrap);
+	DDX_Check(pDX, IDC_CHECK1, m_sAuto);
+	DDX_Check(pDX, IDC_CHECK2, m_tAuto);
+	DDX_CBString(pDX, IDC_COMBO3, m_sType);
+	DDX_CBString(pDX, IDC_COMBO4, m_tType);
+
+	DDX_Text(pDX, IDC_EDIT2, m_materialManager.m_sCoord1);
+	DDX_Text(pDX, IDC_EDIT3, m_materialManager.m_sCoord2);
+	DDX_Text(pDX, IDC_EDIT4, m_materialManager.m_sCoord3);
+	DDX_Text(pDX, IDC_EDIT5, m_materialManager.m_sCoord4);
+	DDX_Text(pDX, IDC_EDIT6, m_materialManager.m_tCoord1);
+	DDX_Text(pDX, IDC_EDIT7, m_materialManager.m_tCoord2);
+	DDX_Text(pDX, IDC_EDIT8, m_materialManager.m_tCoord3);
+	DDX_Text(pDX, IDC_EDIT9, m_materialManager.m_tCoord4);
 }
 
 MyMaterialManager& CMaterialDlg::getMaterialManager(){
-	m_materialManager.m_ambient = m_ambient;
-	m_materialManager.m_diffuse = m_diffuse;
-	m_materialManager.m_shininess = m_shininess;
-	m_materialManager.m_specular = m_specular;
+
+	m_materialManager.m_sRepeat = (m_sWrap == "GL_REPEAT"  || m_sWrap =="");
+	m_materialManager.m_tRepeat = (m_tWrap == "GL_REPEAT"  || m_tWrap =="");
+
+	m_materialManager.m_sAuto = m_sAuto;
+	m_materialManager.m_tAuto = m_tAuto;
+						
+	if (m_sType == "Eye Linier")
+		m_materialManager.m_sType = 1;
+	else if (m_sType == "Object Linier")
+		m_materialManager.m_sType = 2;
+	else
+		m_materialManager.m_sType = 3;
+
+
+	if (m_tType == "Eye Linier")
+		m_materialManager.m_tType = 1;
+	else if (m_tType == "Object Linier")
+		m_materialManager.m_tType = 2;
+	else
+		m_materialManager.m_tType = 3;
+
+
 
 	return m_materialManager;
 }
+
+BOOL CMaterialDlg::OnInitDialog(){
+    CDialog::OnInitDialog();
+
+	return TRUE;
+
+}
+
 
 BEGIN_MESSAGE_MAP(CMaterialDlg, CDialog)
 END_MESSAGE_MAP()

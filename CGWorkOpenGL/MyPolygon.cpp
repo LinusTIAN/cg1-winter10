@@ -1,9 +1,11 @@
+#include <list>
+#include <new>
+#include <assert.h>
+
 #include "MyPolygon.h"
 #include "MyVertex.h"
 #include "MyPostEffect.h"
 #include "globals.h"
-#include <list>
-#include <new>
 
 MyPolygon::MyPolygon(int nVertices, int norm_x, int norm_y, int norm_z)
 	:	normal(norm_x, norm_y, norm_z)
@@ -33,7 +35,6 @@ void MyPolygon::setTexture(GLuint texture){
 	m_showTexture = true;
 }
 
-#include <assert.h>
 void MyPolygon::Draw(void)
 {
 	if (m_showTexture){
@@ -65,33 +66,17 @@ void MyPolygon::Draw(void)
 		}
 
 		//Draw texture		
-		if (m_showTexture){
+		//if (m_showTexture)
+		{
 			//if (nextVertex !=4)
 			//	assert(0);
-			if (i==0)
-				glTexCoord2f(0.0, 0.0);
-			else if (i==1)
-				glTexCoord2f(1.0, 0.0);
-			else if (i==2)
-				glTexCoord2f(1.0, 1.0);
-			else if (i==3)
-				glTexCoord2f(0.0, 1.0);
+			
 		}
 		
-		//Draw normal
-		GLfloat norm[3]; 
-		
-		norm[0] = m_vertices[i].normal.m_x;
-		norm[1] = m_vertices[i].normal.m_y;
-		norm[2] = m_vertices[i].normal.m_z;
-
-		if (norm[0]==0 &&norm[1]==0 && norm[2]==0){
-			assert(0);
-		}
-		glNormal3fv(norm);
 
 		//Draw vertex
-		glVertex3d(m_vertices[i].x, m_vertices[i].y, m_vertices[i].z);
+		//glVertex3d(m_vertices[i].x, m_vertices[i].y, m_vertices[i].z);
+		m_vertices[i].Draw();
 	}
 
 	glEnd();

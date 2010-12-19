@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PngWrapper.h"
+#include "MyMaterialManager.h"
 //
 class MyTextureManager
 {
@@ -10,9 +11,10 @@ public:
 
 
 	int addPTexture(const char *str, bool fullPath);
+	void setupTexture(MyMaterialManager& materialManager);
 
 private:
-	int setUpTexture(PngWrapper* wrapper);
+	int bindTexture(PngWrapper* wrapper);
 	
 	
 // Find the largest power of two that is
