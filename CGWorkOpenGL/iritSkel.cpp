@@ -189,6 +189,9 @@ bool CGSkelStoreData(IPObjectStruct *PObj)
 				if(PVertex->Attr && PVertex->Attr->Type==IP_ATTR_UV){
 					v.setUV(PVertex->Attr->U.UV[0], PVertex->Attr->U.UV[1]);
 				}
+				else{
+					//AfxMessageBox("No UV!!");
+				}
 
 				poly->AddVertex(v);
 

@@ -29,21 +29,10 @@ public:
 	DECLARE_MESSAGE_MAP()
 public:
 	CButton m_colorButton;
-	afx_msg void OnBnClickedButton1();
-	CEdit m_rColorCtrl;
-	CEdit m_gColorCtrl;
-	CEdit m_bColorCtrl;
-	CString m_rColor;
-	CString m_gColor;
-	CString m_bColor;
-	CComboBox m_modeCtrl;
 	CString m_mode;
-	CEdit m_densityCtrl;
-	CString m_density;
 
 private:
 	MyFogPrameters m_fogPrameters;
 public:
-	CButton m_enabledCtrl;
 	BOOL m_enabled;
 };

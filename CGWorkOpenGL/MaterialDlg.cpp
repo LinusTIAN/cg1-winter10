@@ -31,6 +31,7 @@ CMaterialDlg::CMaterialDlg(MyMaterialManager& materialManager, CWnd* pParent /*=
 	else
 		m_tWrap = "GL_CLAMP";
 
+	
 	switch(materialManager.m_sType){
 	case  1:
 		m_sType = "Eye Linier";
@@ -39,7 +40,7 @@ CMaterialDlg::CMaterialDlg(MyMaterialManager& materialManager, CWnd* pParent /*=
 		m_sType = "Object Linier";
 		break;
 	default:
-		m_sType = "Sphere Map;";
+		m_sType = "Sphere Map";
 		break;
 	}
 
@@ -52,7 +53,7 @@ CMaterialDlg::CMaterialDlg(MyMaterialManager& materialManager, CWnd* pParent /*=
 		m_tType = "Object Linier";
 		break;
 	default:
-		m_tType = "Sphere Map;";
+		m_tType = "Sphere Map";
 		break;
 	}
 }
