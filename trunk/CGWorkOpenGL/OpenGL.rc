@@ -123,6 +123,8 @@ BEGIN
         MENUITEM "Show &Vertex Normals",        ID_OPTIONS_SHOWVERTICESNORMALS
         MENUITEM "Show &Face Normals",          ID_OPTIONS_SHOWFACESNORMALS
         MENUITEM "Mouse &Torch",                ID_OPTIONS_TORCH
+        MENUITEM SEPARATOR
+        MENUITEM "Back Faces Culling",          ID_OPTIONS_BACKFACESCULLING
     END
     POPUP "&Light"
     BEGIN
@@ -133,6 +135,8 @@ BEGIN
             MENUITEM "&Wireframe",                  ID_SHADING_WIREFRAME
         END
         MENUITEM "&Parameters...",              ID_LIGHT_CONSTANTS
+        MENUITEM SEPARATOR
+        MENUITEM "&Fog...",                     ID_LIGHT_FOG
     END
     POPUP "&Material"
     BEGIN
@@ -282,6 +286,25 @@ BEGIN
     LTEXT           "Enter 'd' value:",IDC_STATIC,25,30,49,8
 END
 
+IDD_FogDialog DIALOGEX 0, 0, 316, 183
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Fog Parameters"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,205,162,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,259,162,50,14
+    PUSHBUTTON      "Choose...",IDC_BUTTON1,227,44,48,17
+    LTEXT           "Color:",IDC_STATIC,25,47,22,15
+    EDITTEXT        IDC_EDIT1,57,45,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT2,107,45,40,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT3,155,45,38,14,ES_AUTOHSCROLL
+    LTEXT           "Mode:",IDC_STATIC,23,70,21,8
+    COMBOBOX        IDC_COMBO1,57,73,105,14,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Density:",IDC_STATIC,25,103,30,12
+    EDITTEXT        IDC_EDIT4,61,103,72,13,ES_AUTOHSCROLL
+    CONTROL         "Enabled",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,23,79,13
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -341,6 +364,17 @@ BEGIN
     0
 END
 
+IDD_FogDialog DLGINIT
+BEGIN
+    IDC_COMBO1, 0x403, 7, 0
+0x4c47, 0x455f, 0x5058, "\000" 
+    IDC_COMBO1, 0x403, 8, 0
+0x4c47, 0x455f, 0x5058, 0x0032, 
+    IDC_COMBO1, 0x403, 10, 0
+0x4c47, 0x4c5f, 0x4e49, 0x4145, 0x0052, 
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -364,6 +398,14 @@ BEGIN
         RIGHTMARGIN, 255
         TOPMARGIN, 7
         BOTTOMMARGIN, 92
+    END
+
+    IDD_FogDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 309
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 176
     END
 END
 #endif    // APSTUDIO_INVOKED

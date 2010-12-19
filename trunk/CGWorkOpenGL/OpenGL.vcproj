@@ -220,6 +220,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\FogDialog.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\iritSkel.cpp"
 				>
 			</File>
@@ -267,6 +271,10 @@
 			</File>
 			<File
 				RelativePath=".\MyFileData.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MyFogPrameters.cpp"
 				>
 			</File>
 			<File
@@ -421,6 +429,10 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
+				RelativePath=".\FogDialog.h"
+				>
+			</File>
+			<File
 				RelativePath=".\globals.h"
 				>
 			</File>
@@ -458,6 +470,10 @@
 			</File>
 			<File
 				RelativePath=".\MyFileData.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MyFogPrameters.h"
 				>
 			</File>
 			<File
