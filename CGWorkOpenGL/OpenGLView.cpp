@@ -16,6 +16,7 @@ using std::endl;
 
 #include "MouseSensitivityDialog.h"
 #include "PerspectiveOptionsDialog.h"
+#include "FogDialog.h"
 
 #include "globals.h"
 
@@ -102,6 +103,9 @@ BEGIN_MESSAGE_MAP(COpenGLView, CView)
 	ON_COMMAND(ID_SHADING_WIREFRAME, &COpenGLView::OnShadingWireframe)
 	ON_UPDATE_COMMAND_UI(ID_SHADING_WIREFRAME, &COpenGLView::OnUpdateShadingWireframe)
 	ON_COMMAND(ID_MATERIAL_LOADTEXTURE, &COpenGLView::OnMaterialLoadtexture)
+	ON_COMMAND(ID_OPTIONS_BACKFACESCULLING, &COpenGLView::OnOptionsBackfacesculling)
+	ON_UPDATE_COMMAND_UI(ID_OPTIONS_BACKFACESCULLING, &COpenGLView::OnUpdateOptionsBackfacesculling)
+	ON_COMMAND(ID_LIGHT_FOG, &COpenGLView::OnLightFog)
 END_MESSAGE_MAP()
 
 
@@ -126,6 +130,7 @@ COpenGLView::COpenGLView()
 	m_showVertexNormals = false;
 	m_showFaceNormals = false;
 	m_recompile = false;
+	m_showBackFaces = true;
 	m_backgroundColor[0] = m_backgroundColor[1] = m_backgroundColor[2] = 0;
 
 	// Set default values
@@ -422,8 +427,10 @@ void COpenGLView::OnDraw(CDC* pDC)
 	COpenGLDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 
+	// Light
 	setupLightInScene();
 
+	// Shading
 	if (m_nLightShading == ID_LIGHT_SHADING_FLAT){
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		glShadeModel (GL_FLAT);
@@ -436,7 +443,16 @@ void COpenGLView::OnDraw(CDC* pDC)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-	
+
+	// Culling
+	if (m_showBackFaces){
+		glDisable(GL_CULL_FACE);
+	}
+	else{
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+	}
+
 	
 	glClearColor((GLclampf)m_backgroundColor[0], (GLclampf)m_backgroundColor[1], (GLclampf)m_backgroundColor[2], 0.0f);
 
@@ -1380,6 +1396,40 @@ void COpenGLView::setupLightInScene(){
 		if (m_lights[i].space == LIGHT_SPACE_LOCAL)
 			m_lightManager.showLight(m_lights[i], i);
 	}
+
+
+	if (m_fogFarams.enabled)
+   {
+		glEnable(GL_FOG);
+		GLfloat fogColor[4] = {	m_fogFarams.m_r / 255.0, 
+								m_fogFarams.m_g / 255.0, 
+								m_fogFarams.m_b / 255.0, 
+								1.0};
+
+		GLint fogMode = GL_EXP;
+		
+		switch (m_fogFarams.m_type){
+			case FOG_GL_EXP:
+				fogMode = GL_EXP;
+				break;
+			case FOG_GL_EXP2:
+				fogMode = GL_EXP2;
+				break;
+			case FOG_GL_LINEAR:
+				fogMode = GL_LINEAR;
+				break;
+		}
+		glFogi (GL_FOG_MODE, fogMode);
+		glFogfv (GL_FOG_COLOR, fogColor);
+		glFogf (GL_FOG_DENSITY, m_fogFarams.m_density);
+		glHint (GL_FOG_HINT, GL_DONT_CARE);
+		glFogf (GL_FOG_START, 1.0);
+		glFogf (GL_FOG_END, 5.0);
+   }
+	else{
+		glDisable(GL_FOG);
+	}
+
 	
 }
 void COpenGLView::OnMaterialLoadtexture()
@@ -1395,6 +1445,26 @@ void COpenGLView::OnMaterialLoadtexture()
 			s_fileData->m_objects[i]->addPTexture(file.c_str(), true);
 		}
 		m_recompile = true;
+		Invalidate();
+	}
+}
+
+void COpenGLView::OnOptionsBackfacesculling()
+{
+	m_showBackFaces = !m_showBackFaces;
+	Invalidate();
+}
+
+void COpenGLView::OnUpdateOptionsBackfacesculling(CCmdUI *pCmdUI)
+{
+	pCmdUI->SetCheck( !m_showBackFaces);
+}
+
+void COpenGLView::OnLightFog()
+{
+	CFogDialog dlg(m_fogFarams);
+	if (dlg.DoModal () == IDOK) {
+		m_fogFarams = dlg.getFogParams();
 		Invalidate();
 	}
 }

@@ -18,6 +18,7 @@
 #include "atltypes.h"
 #include "MyTorchFX.h"
 #include "MyLight.h"
+#include "MyFogPrameters.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // #defined Constants
@@ -62,6 +63,7 @@ private:
 	bool m_recompile;
 	double m_backgroundColor[3];
 	float m_dVal;
+	MyFogPrameters m_fogFarams;
 	//MyTorchFX *m_torch;
 
 
@@ -100,6 +102,7 @@ protected:
 	double	m_zNear,
 			m_zFar;		// hold the clipping planes
 	MyLight m_lightManager;
+	bool m_showBackFaces;
 
 private:
 	void draw_axis();
@@ -185,6 +188,9 @@ public:
 	afx_msg void OnShadingWireframe();
 	afx_msg void OnUpdateShadingWireframe(CCmdUI *pCmdUI);
 	afx_msg void OnMaterialLoadtexture();
+	afx_msg void OnOptionsBackfacesculling();
+	afx_msg void OnUpdateOptionsBackfacesculling(CCmdUI *pCmdUI);
+	afx_msg void OnLightFog();
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp
