@@ -19,6 +19,7 @@
 #include "MyTorchFX.h"
 #include "MyLight.h"
 #include "MyFogPrameters.h"
+#include "MyMaterialManager.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // #defined Constants
@@ -48,11 +49,6 @@ private:
 
 	int m_nLightShading;			// shading: Flat, Gouraud.
 
-	double m_lMaterialAmbient;		// The Ambient in the scene
-	double m_lMaterialDiffuse;		// The Diffuse in the scene
-	double m_lMaterialSpecular;		// The Specular in the scene
-	int m_nMaterialCosineFactor;		// The cosine factor for the specular
-
 	LightParams m_lights[MAX_LIGHT];	//configurable lights array
 	LightParams m_ambientLight;		//ambient light (only RGB is used)
 
@@ -64,6 +60,7 @@ private:
 	double m_backgroundColor[3];
 	float m_dVal;
 	MyFogPrameters m_fogFarams;
+	MyMaterialManager m_materialManager;
 	//MyTorchFX *m_torch;
 
 
@@ -191,6 +188,7 @@ public:
 	afx_msg void OnOptionsBackfacesculling();
 	afx_msg void OnUpdateOptionsBackfacesculling(CCmdUI *pCmdUI);
 	afx_msg void OnLightFog();
+	afx_msg void OnMaterialProperties();
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp

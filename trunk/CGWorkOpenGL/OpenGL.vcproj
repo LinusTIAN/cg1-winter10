@@ -286,6 +286,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MyMaterialManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MyPolygon.cpp"
 				>
 			</File>
@@ -482,6 +486,10 @@
 			</File>
 			<File
 				RelativePath=".\MyLight.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MyMaterialManager.h"
 				>
 			</File>
 			<File

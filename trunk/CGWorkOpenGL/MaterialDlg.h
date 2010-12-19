@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include "MyMaterialManager.h"
 // CMaterialDlg dialog
 
 class CMaterialDlg : public CDialog
@@ -8,8 +8,10 @@ class CMaterialDlg : public CDialog
 	DECLARE_DYNAMIC(CMaterialDlg)
 
 public:
-	CMaterialDlg(CWnd* pParent = NULL);   // standard constructor
+	CMaterialDlg(MyMaterialManager& materialManager, CWnd* pParent = NULL);   // standard constructor
 	virtual ~CMaterialDlg();
+
+	MyMaterialManager& getMaterialManager();
 
 // Dialog Data
 	enum { IDD = IDD_MATERIAL_DLG };
@@ -25,7 +27,10 @@ public:
     // Diffuse property of the material
     double m_diffuse;
     // shininess property of the material
-    double m_shininess;
+    int m_shininess;
     // specular property of the material (integer values only)
-    int m_specular;
+    double m_specular;
+
+
+	MyMaterialManager m_materialManager;
 };
