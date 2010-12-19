@@ -20,6 +20,7 @@
 #include "MyLight.h"
 #include "MyFogPrameters.h"
 #include "MyMaterialManager.h"
+#include "MyTextureManager.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // #defined Constants
@@ -42,7 +43,7 @@ private:
 	int m_nAxis;				// Axis of Action, X Y or Z
 	int m_nAction;				// Rotate, Translate, Scale
 	int m_nView;				// Orthographic, perspective
-	int m_nSpace;				// Object/View-space transform
+	int m_nSpace;				// Object/View-space/texture transform
 	bool m_bIsPerspective;			// is the view perspective
 	
 	CString m_strItdFileName;		// file name of IRIT data
@@ -61,6 +62,7 @@ private:
 	float m_dVal;
 	MyFogPrameters m_fogFarams;
 	MyMaterialManager m_materialManager;
+	MyTextureManager m_textureManager;
 	//MyTorchFX *m_torch;
 
 
@@ -189,6 +191,8 @@ public:
 	afx_msg void OnUpdateOptionsBackfacesculling(CCmdUI *pCmdUI);
 	afx_msg void OnLightFog();
 	afx_msg void OnMaterialProperties();
+	afx_msg void OnActionTexturetransformations();
+	afx_msg void OnUpdateActionTexturetransformations(CCmdUI *pCmdUI);
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp

@@ -108,6 +108,8 @@ BEGIN_MESSAGE_MAP(COpenGLView, CView)
 	ON_UPDATE_COMMAND_UI(ID_OPTIONS_BACKFACESCULLING, &COpenGLView::OnUpdateOptionsBackfacesculling)
 	ON_COMMAND(ID_LIGHT_FOG, &COpenGLView::OnLightFog)
 	ON_COMMAND(ID_MATERIAL_PROPERTIES, &COpenGLView::OnMaterialProperties)
+	ON_COMMAND(ID_ACTION_TEXTURETRANSFORMATIONS, &COpenGLView::OnActionTexturetransformations)
+	ON_UPDATE_COMMAND_UI(ID_ACTION_TEXTURETRANSFORMATIONS, &COpenGLView::OnUpdateActionTexturetransformations)
 END_MESSAGE_MAP()
 
 
@@ -429,6 +431,8 @@ void COpenGLView::OnDraw(CDC* pDC)
 	setupLightInScene();
 	m_fogFarams.setupFog();
 	m_materialManager.setupMaterialInScene();
+	m_textureManager.setupTexture(m_materialManager);
+	
 
 	// Shading
 	if (m_nLightShading == ID_LIGHT_SHADING_FLAT){
@@ -679,6 +683,16 @@ void COpenGLView::OnUpdateActionViewspace(CCmdUI *pCmdUI)
 	pCmdUI->SetCheck(m_nSpace == ID_ACTION_VIEWSPACE);
 }
 
+void COpenGLView::OnActionTexturetransformations()
+{
+	m_nSpace = ID_ACTION_TEXTURETRANSFORMATIONS;
+}
+
+void COpenGLView::OnUpdateActionTexturetransformations(CCmdUI *pCmdUI)
+{
+	pCmdUI->SetCheck(m_nSpace == ID_ACTION_TEXTURETRANSFORMATIONS);
+}
+
 void COpenGLView::OnActionRotate() 
 {
 	m_nAction = ID_ACTION_ROTATE;
@@ -816,6 +830,16 @@ void COpenGLView::OnUpdateShadingWireframe(CCmdUI *pCmdUI)
 	pCmdUI->SetCheck(m_nLightShading == ID_SHADING_WIREFRAME);
 }
 
+void COpenGLView::OnOptionsBackfacesculling()
+{
+	m_showBackFaces = !m_showBackFaces;
+	Invalidate();
+}
+
+void COpenGLView::OnUpdateOptionsBackfacesculling(CCmdUI *pCmdUI)
+{
+	pCmdUI->SetCheck( !m_showBackFaces);
+}
 
 // LIGHT SETUP HANDLER ///////////////////////////////////////////
 
@@ -914,7 +938,10 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 		glPopMatrix();
 		glPushMatrix();
 		
-
+		if (m_nSpace == ID_ACTION_TEXTURETRANSFORMATIONS)
+		{
+			glMatrixMode(GL_TEXTURE);
+		}
 		switch (m_nAction)
 		{
 		case ID_ACTION_ROTATE:
@@ -935,6 +962,7 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 		}
 
 
+		glMatrixMode(GL_MODELVIEW);
 		mustRedraw = true;
 	}
 
@@ -975,6 +1003,9 @@ void COpenGLView::RotateModel(double x_amt, double y_amt)
 
 	double	rotate_amt = (x_amt + y_amt) * factor,
 			rotate_axis_x, rotate_axis_y, rotate_axis_z;
+
+	
+
 
 	switch (m_nAxis)
 	{
@@ -1414,16 +1445,7 @@ void COpenGLView::OnMaterialLoadtexture()
 	}
 }
 
-void COpenGLView::OnOptionsBackfacesculling()
-{
-	m_showBackFaces = !m_showBackFaces;
-	Invalidate();
-}
 
-void COpenGLView::OnUpdateOptionsBackfacesculling(CCmdUI *pCmdUI)
-{
-	pCmdUI->SetCheck( !m_showBackFaces);
-}
 
 void COpenGLView::OnLightFog()
 {

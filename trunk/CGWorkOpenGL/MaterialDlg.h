@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MyMaterialManager.h"
+#include "afxwin.h"
 // CMaterialDlg dialog
 
 class CMaterialDlg : public CDialog
@@ -16,21 +17,20 @@ public:
 // Dialog Data
 	enum { IDD = IDD_MATERIAL_DLG };
 
+	BOOL OnInitDialog();
+
+
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 	DECLARE_MESSAGE_MAP()
 public:
 
-    // ambient property of the material
-    double m_ambient;
-    // Diffuse property of the material
-    double m_diffuse;
-    // shininess property of the material
-    int m_shininess;
-    // specular property of the material (integer values only)
-    double m_specular;
-
-
 	MyMaterialManager m_materialManager;
+	CString m_sWrap;
+	CString m_tWrap;
+	BOOL m_sAuto;
+	BOOL m_tAuto;
+	CString m_sType;
+	CString m_tType;
 };

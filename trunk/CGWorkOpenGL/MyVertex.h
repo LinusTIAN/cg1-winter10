@@ -5,27 +5,27 @@
 #include "gl\gl.h"    // Include the standard OpenGL  headers
 #include "gl\glu.h"   // Add the utility library
 
-class MyVertex :
-	public MyGlDrawable
+class MyVertex : public MyGlDrawable
 {
 public:
 	MyVertex(void);
 	MyVertex(double x, double y, double z);
-	MyVertex(double x, double y, double z,
-			 double norm_x, double norm_y, double norm_z);
 	~MyVertex(void);
 
-	void Draw(void) {
-		glBegin(GL_POINTS);
-			glVertex3d(x, y, z);
-		glEnd();
-	}
+	void setUV(double u, double v);
+	void setNormal(double norm_x, double norm_y, double norm_z);
+
+	void Draw();
 
 	MyBoundingBox GetBoundingBox()
 	{
 		return MyBoundingBox(x,x,y,y,z,z);
 	}
 
+public:
 	double x, y, z;
 	MyVector normal;
+
+	double m_u, m_v;
+	bool m_hasUV;
 };
