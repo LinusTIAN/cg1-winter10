@@ -11,6 +11,8 @@ using namespace std;
 
 MyTextureManager::MyTextureManager(void)
 {
+	m_enabled = true;
+	m_showTexture = false;
 }
 
 MyTextureManager::~MyTextureManager(void)
@@ -30,7 +32,7 @@ int MyTextureManager::nearestPower( int value )
 }
 
 
-int MyTextureManager::addPTexture(const char *str, bool fullPath){
+void MyTextureManager::addPTexture(const char *str, bool fullPath){
 	
 	string s(str);
 	string fileName(str);
@@ -57,13 +59,14 @@ int MyTextureManager::addPTexture(const char *str, bool fullPath){
 	PngWrapper wrapper;
 	wrapper.SetFileName(fileName.c_str());
 	if (!wrapper.ReadPng())
-		return 0;
+		return ;
 
-	return bindTexture(&wrapper);
+	m_showTexture = true;
+	bindTexture(&wrapper);
 }
 
 
-int MyTextureManager::bindTexture(PngWrapper* wrapper){
+void MyTextureManager::bindTexture(PngWrapper* wrapper){
 	
 	// Read the texture image
 	int imageWidth  = wrapper->GetWidth();
@@ -87,36 +90,34 @@ int MyTextureManager::bindTexture(PngWrapper* wrapper){
 	}
 
 	//Scale the image
-    GLubyte *sImage;
     
-    GLsizei sWidth = nearestPower( imageWidth );
-    GLsizei sHeight = nearestPower( imageHeight );
+    m_sWidth = nearestPower( imageWidth );
+    m_sHeight = nearestPower( imageHeight );
 
     //scale texture image to 2^m by 2^n if necessary 
-    if ( sWidth == imageWidth && sHeight == imageHeight ) {
-         sImage = (GLubyte *) checkImage;
+    if ( m_sWidth == imageWidth && m_sHeight == imageHeight ) {
+         m_sImage = (GLubyte *) checkImage;
     } else {
-         sImage = (GLubyte *)malloc( sHeight*sWidth*4*sizeof( GLubyte ) );
+         m_sImage = (GLubyte *)malloc( m_sHeight*m_sWidth*4*sizeof( GLubyte ) );
          gluScaleImage( GL_RGBA, imageWidth, imageHeight, 
                         GL_UNSIGNED_BYTE, checkImage,
-                        sWidth, sHeight, GL_UNSIGNED_BYTE, sImage );
+                        m_sWidth, m_sHeight, GL_UNSIGNED_BYTE, m_sImage );
+		 delete checkImage;
     }
 	
 	// Define texture
-	GLuint texture = 0;
+	m_texture = 0;
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glGenTextures(1,  &m_texture);
+	glBindTexture(GL_TEXTURE_2D, m_texture);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, sWidth, 
-						sHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
-						sImage);
-
-	return texture;
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_sWidth, 
+						m_sHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
+						m_sImage);
 }
 
 
-void MyTextureManager::setupTexture(MyMaterialManager& materialManager){
+void MyTextureManager::setupGeneralTextureParams(MyMaterialManager& materialManager){
 
 	GLuint sWrapMode = materialManager.m_sRepeat? GL_REPEAT :GL_CLAMP;
 	GLuint tWrapMode = materialManager.m_tRepeat? GL_REPEAT :GL_CLAMP;
@@ -126,4 +127,23 @@ void MyTextureManager::setupTexture(MyMaterialManager& materialManager){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,   GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,   GL_NEAREST);
 
+}
+
+void MyTextureManager::set(){
+	if (m_enabled){
+		if (m_showTexture){
+			glEnable(GL_TEXTURE_2D);
+			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);//GL_DECAL);
+			glBindTexture(GL_TEXTURE_2D,m_texture);
+
+		}
+		else{
+			glDisable(GL_TEXTURE_2D);
+		}
+	}
+}
+
+
+void MyTextureManager::enable(bool enable){
+	m_enabled = enable;
 }

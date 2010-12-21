@@ -36,8 +36,11 @@ void MyFileData::addObjectRef(My3dObject* obj){
 	bbox.update(obj->bbox);
 }
 
+void MyFileData::Draw(){
+	Draw(false, false, false, false);
+}
 
-void MyFileData::draw(bool torchEnabled, bool showFaceNormals, bool showVertexNormals, bool recompile){
+void MyFileData::Draw(bool torchEnabled, bool showFaceNormals, bool showVertexNormals, bool recompile){
 	for (int i=0; i < m_nextObj; i++){
 		if (!torchEnabled){
 			// can use the compiled display list
@@ -52,7 +55,7 @@ void MyFileData::draw(bool torchEnabled, bool showFaceNormals, bool showVertexNo
 			glCallList( m_objects[i]->GetNormalsDisplayList(showFaceNormals, showVertexNormals) );
 	}
 
-}
+}/*
 void MyFileData::drawBoundingBox(){
 	glBegin(GL_LINE_LOOP);
 		glVertex3d(bbox.x_min, bbox.y_min, bbox.z_min);
@@ -78,7 +81,7 @@ void MyFileData::drawBoundingBox(){
 		glVertex3d(bbox.x_max, bbox.y_max, bbox.z_min);
 		glVertex3d(bbox.x_max, bbox.y_max, bbox.z_max);
 	glEnd();
-}
+}*/
 
 void MyFileData::init(bool showFaceNormals, bool showVertexNormals){
 	// make it generate the display lists in advance

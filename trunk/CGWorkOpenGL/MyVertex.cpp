@@ -33,8 +33,14 @@ void MyVertex::setUV(double u, double v){
 }
 
 void MyVertex::Draw() {
+	// draw texture
 	if (m_hasUV){
 		glTexCoord2f(m_u, m_v);
+	}
+	else{
+		int y;
+		y++;
+
 	}
 	/*else{
 		if (iterationNum==0)
@@ -48,15 +54,8 @@ void MyVertex::Draw() {
 	}*/
 
 	//draw normal
-	GLfloat norm[3]; 
-	
-	norm[0] = normal.m_x;
-	norm[1] = normal.m_y;
-	norm[2] = normal.m_z;
-
-	//if (norm[0]==0 && norm[1]==0 && norm[2]==0){
-		assert(! (norm[0]==0 && norm[1]==0 && norm[2]==0));
-	//}
+	GLfloat norm[3] = {normal.m_x, normal.m_y, normal.m_z}; 
+	assert(! (norm[0]==0 && norm[1]==0 && norm[2]==0)); //TODO check which model hasn't any normals
 	glNormal3fv(norm);
 
 	//draw vertex

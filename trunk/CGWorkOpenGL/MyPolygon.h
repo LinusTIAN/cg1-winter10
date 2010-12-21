@@ -23,8 +23,6 @@ public:
 	// post-effect options are saved globally - last call to PushPostEffect decides!
 	void PushPostEffect(MyPostEffect* fx, long flags);
 
-	void setTexture(GLuint texture);
-
 	static const int PFX_VERTICES	= 0x1;
 	static const int PFX_FACES		= 0x2;
 
@@ -33,6 +31,4 @@ private:
 	bool normalInitialized;	// is normal given in constructor or to be calculated?
 	bool pfx_PerFace,
 		 pfx_PerVertex;
-	bool m_showTexture;
-	GLuint m_texture;
 };
