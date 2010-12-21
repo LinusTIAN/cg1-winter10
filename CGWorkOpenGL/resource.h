@@ -41,7 +41,6 @@
 #define IDC_MOUSESLIDER                 1041
 #define IDC_MATERIAL_SPECULAR           1042
 #define IDC_EDIT1                       1042
-#define IDC_BUTTON1                     1043
 #define IDC_EDIT2                       1044
 #define IDC_EDIT3                       1045
 #define IDC_COMBO1                      1046
@@ -95,15 +94,17 @@
 #define ID_OPTIONS_BACKFACESCULLING     32835
 #define ID_LIGHT_FOG                    32836
 #define ID_MATERIAL_PROPERTIES          32837
-#define ID_BUTTON32838                  32838
 #define ID_ACTION_TEXTURETRANSFORMATIONS 32839
+#define ID_FILE_RESET32840              32840
+#define ID_RESET_LIGHT                  32841
+#define ID_RESET_VIEW                   32842
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        145
-#define _APS_NEXT_COMMAND_VALUE         32840
+#define _APS_NEXT_COMMAND_VALUE         32843
 #define _APS_NEXT_CONTROL_VALUE         1062
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

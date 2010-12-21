@@ -54,11 +54,20 @@ public:
     double dirY;
     double dirZ;
     
-    LightParams():
-	enabled(false),type(LIGHT_TYPE_POINT),space(LIGHT_SPACE_VIEW),
-	colorR(255),colorG(255),colorB(255),posX(3),posY(3),posZ(3),
-	dirX(0),dirY(0),dirZ(-1)
-    {}
+    LightParams()
+    {
+		reset();
+	}
+
+	void reset(){
+		enabled = false;
+		type = LIGHT_TYPE_POINT;
+		space = LIGHT_SPACE_VIEW;
+		colorR = colorG = colorB = 255;
+		posX = posY = posZ = 3;
+		dirX = dirY = 0;
+		dirZ = -1;
+	}
 
 protected:
 private:
