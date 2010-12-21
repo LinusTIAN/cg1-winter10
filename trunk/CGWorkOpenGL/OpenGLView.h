@@ -193,6 +193,8 @@ public:
 	afx_msg void OnMaterialProperties();
 	afx_msg void OnActionTexturetransformations();
 	afx_msg void OnUpdateActionTexturetransformations(CCmdUI *pCmdUI);
+	afx_msg void OnResetLight();
+	afx_msg void OnResetView();
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp

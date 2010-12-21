@@ -110,6 +110,8 @@ BEGIN_MESSAGE_MAP(COpenGLView, CView)
 	ON_COMMAND(ID_MATERIAL_PROPERTIES, &COpenGLView::OnMaterialProperties)
 	ON_COMMAND(ID_ACTION_TEXTURETRANSFORMATIONS, &COpenGLView::OnActionTexturetransformations)
 	ON_UPDATE_COMMAND_UI(ID_ACTION_TEXTURETRANSFORMATIONS, &COpenGLView::OnUpdateActionTexturetransformations)
+	ON_COMMAND(ID_RESET_LIGHT, &COpenGLView::OnResetLight)
+	ON_COMMAND(ID_RESET_VIEW, &COpenGLView::OnResetView)
 END_MESSAGE_MAP()
 
 
@@ -1389,18 +1391,15 @@ void COpenGLView::OnFileReset()
 }
 
 void COpenGLView::lightReset(){
-
-	m_lights[0].space = LIGHT_SPACE_VIEW;
 	
 	setupLightInScene();
 
 	for (int id=LIGHT_ID_1;id<MAX_LIGHT;id++)
 	{	    
-		m_lights[id].enabled = false;
+		m_lights[id].reset();
 	}
 	m_lights[0].enabled = true;
 	m_ambientLight.colorR = m_ambientLight.colorG = m_ambientLight.colorB = 0;
-
 }
 
 
@@ -1465,4 +1464,15 @@ void COpenGLView::OnMaterialProperties()
 		m_materialManager = dlg.getMaterialManager();
 		Invalidate();
 	}
+}
+
+void COpenGLView::OnResetLight()
+{
+	lightReset();
+	Invalidate();
+}
+
+void COpenGLView::OnResetView()
+{
+	OnFileReset();
 }
