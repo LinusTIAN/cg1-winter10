@@ -107,6 +107,7 @@ private:
 	void draw_axis();
 	void scaleAccordingToAxis(double scale_amt);
 	void lightReset();
+	void materialReset();
 	void setupLightInScene();
 
 

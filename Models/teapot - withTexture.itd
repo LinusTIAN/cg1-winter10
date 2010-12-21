@@ -222,7 +222,8 @@
             ]
 
         ]
-        [OBJECT
+        [OBJECT		
+		[ptexture "wall4.png"]
             [color 5]
             HANDLE
             [SURFACE BSPLINE 7 7 4 4 E3

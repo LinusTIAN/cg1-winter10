@@ -7,6 +7,7 @@ public:
 	~MyMaterialManager(void);
 
 	void setupMaterialInScene();
+	void reset();
 
 public:
 	

@@ -28,6 +28,10 @@ void MyLight::setupGeneralLight(bool show, LightParams& params ){
 	GLfloat lmodel_ambient[] = { m_params.colorR/255.0, m_params.colorG/255.0, m_params.colorB/255.0, 1.0 };
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
 
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+
+	//glHint(GL_FRAGMENT_SHADER_DERIVATIVE_HINT, GL_NICEST);
+	//glHint(GL_PRESPECVITE_CORRECTION_HINT, GL_NICEST);
 }
 
 

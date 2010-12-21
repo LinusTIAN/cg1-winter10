@@ -146,7 +146,7 @@ COpenGLView::COpenGLView()
 	m_nSpace = ID_ACTION_OBJECTSPACE;
 	m_bIsPerspective = false;
 
-	m_nLightShading = ID_LIGHT_SHADING_FLAT;
+	m_nLightShading = ID_LIGHT_SHADING_GOURAUD;
 
 
 	//init the first light to be enabled
@@ -247,6 +247,8 @@ BOOL COpenGLView::InitializeOpenGL()
 	::glClearColor(0.0, 0.0, 0.0, 1.0f);
 	// Set wireframe mode
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+	// Enable auto-normalize of vertex normals
+	glEnable(GL_NORMALIZE);
 
 	// The code expects only the 2nd frame in the projection matrix to be used and the
 	// first one to always be the identity matrix, so make sure this is the case
@@ -435,8 +437,6 @@ void COpenGLView::OnDraw(CDC* pDC)
 	setupLightInScene();
 	m_fogFarams.setupFog();
 	m_materialManager.setupMaterialInScene();
-	m_textureManager.setupGeneralTextureParams(m_materialManager);
-	
 
 	// Shading
 	if (m_nLightShading == ID_LIGHT_SHADING_FLAT){
@@ -614,6 +614,7 @@ void COpenGLView::OnFileLoad()
 		s_fileData->init(m_showFaceNormals, m_showVertexNormals);
 
 		OnFileReset();
+		materialReset();
 	} 
 }
 
@@ -1463,6 +1464,14 @@ void COpenGLView::OnMaterialProperties()
 	CMaterialDlg dlg(m_materialManager);
 	if (dlg.DoModal () == IDOK) {
 		m_materialManager = dlg.getMaterialManager();
+		m_textureManager.setupTextureParams(m_materialManager);
+		m_textureManager.set();
+
+		for (int i = 0; i< s_fileData->m_nextObj; i++){
+			s_fileData->m_objects[i]->m_textureManager.setupTextureParams(m_materialManager);
+		}
+
+		m_recompile = true;
 		Invalidate();
 	}
 }
@@ -1476,4 +1485,10 @@ void COpenGLView::OnResetLight()
 void COpenGLView::OnResetView()
 {
 	OnFileReset();
+}
+
+
+void COpenGLView::materialReset(){
+	m_materialManager.reset();
+	m_textureManager.setupTextureParams(m_materialManager);
 }

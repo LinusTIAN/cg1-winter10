@@ -4,24 +4,7 @@
 
 MyMaterialManager::MyMaterialManager(void)
 {
-	m_ambient = 0.2;
-    m_diffuse = 0.8;
-    m_specular = 1.0;
-	m_shininess = 32;
-
-	m_sRepeat = m_tRepeat = true;
-	
-	m_sAuto = m_tAuto = false;
-	m_sType = m_tType = 1;
-	m_sCoord1 = 0.0;
-	m_sCoord2 = 1.0;
-	m_sCoord3 = 1.0;
-	m_sCoord4 = 0.0;
-
-	m_tCoord1 = 0.0;
-	m_tCoord2 = 1.0;
-	m_tCoord3 = 1.0;
-	m_tCoord4 = 0.0;
+	reset();
 }
 
 MyMaterialManager::~MyMaterialManager(void)
@@ -40,4 +23,26 @@ void MyMaterialManager::setupMaterialInScene(){
 	
 	GLfloat mat_ambient[] = { m_ambient, m_ambient, m_ambient, 1.0 };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
+}
+
+void MyMaterialManager::reset(){
+
+	m_ambient = 0.2;
+    m_diffuse = 0.8;
+    m_specular = 1.0;
+	m_shininess = 32;
+
+	m_sRepeat = m_tRepeat = true;
+	
+	m_sAuto = m_tAuto = false;
+	m_sType = m_tType = 1;
+	m_sCoord1 = 0.0;
+	m_sCoord2 = 1.0;
+	m_sCoord3 = 1.0;
+	m_sCoord4 = 0.0;
+
+	m_tCoord1 = 0.0;
+	m_tCoord2 = 1.0;
+	m_tCoord3 = 1.0;
+	m_tCoord4 = 0.0;
 }
