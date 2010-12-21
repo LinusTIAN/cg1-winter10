@@ -11,7 +11,7 @@ public:
 
 
 	void addPTexture(const char *str, bool fullPath);
-	void setupGeneralTextureParams(MyMaterialManager& materialManager);
+	void setupTextureParams(MyMaterialManager& materialManager);
 	void set();
 	void enable(bool enable);
 
@@ -24,6 +24,7 @@ private:
 	unsigned char* m_sImage;
 	bool m_showTexture;
 	bool m_enabled;
+	MyMaterialManager m_materialManager;
 	//PngWrapper m_wrapper;
 	
 	

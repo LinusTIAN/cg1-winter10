@@ -38,8 +38,6 @@ void MyVertex::Draw() {
 		glTexCoord2f(m_u, m_v);
 	}
 	else{
-		int y;
-		y++;
 
 	}
 	/*else{

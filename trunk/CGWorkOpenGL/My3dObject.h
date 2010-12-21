@@ -31,13 +31,12 @@ public:
 	static const int PFX_VERTICES	= 0x1;
 	static const int PFX_FACES		= 0x2;
 
-private:
-
+public:
+	MyTextureManager m_textureManager;
 
 private:
 	int nextPoly;
 	int arrSize;
 	int m_NormalsDisplayList[4];	// holds a display list for each of the 4 possible combinations
-									// of normal-drawing settings (off/off, on/off etc...)
-	MyTextureManager m_textureManager;
+									// of normal-drawing settings (off/off, on/off etc...
 };

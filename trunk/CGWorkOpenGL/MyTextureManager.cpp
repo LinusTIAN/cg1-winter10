@@ -114,19 +114,13 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper){
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_sWidth, 
 						m_sHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
 						m_sImage);
+
+	
 }
 
 
-void MyTextureManager::setupGeneralTextureParams(MyMaterialManager& materialManager){
-
-	GLuint sWrapMode = materialManager.m_sRepeat? GL_REPEAT :GL_CLAMP;
-	GLuint tWrapMode = materialManager.m_tRepeat? GL_REPEAT :GL_CLAMP;
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWrapMode);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrapMode);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,   GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,   GL_NEAREST);
-
+void MyTextureManager::setupTextureParams(MyMaterialManager& materialManager){
+	m_materialManager = materialManager;
 }
 
 void MyTextureManager::set(){
@@ -135,7 +129,14 @@ void MyTextureManager::set(){
 			glEnable(GL_TEXTURE_2D);
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);//GL_DECAL);
 			glBindTexture(GL_TEXTURE_2D,m_texture);
+					
+			GLuint sWrapMode = m_materialManager.m_sRepeat? GL_REPEAT :GL_CLAMP;
+			GLuint tWrapMode = m_materialManager.m_tRepeat? GL_REPEAT :GL_CLAMP;
 
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWrapMode);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrapMode);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,   GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,   GL_NEAREST);
 		}
 		else{
 			glDisable(GL_TEXTURE_2D);
