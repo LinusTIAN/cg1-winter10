@@ -49,18 +49,21 @@ void MyLight::showLight(LightParams& light, int num){
 	switch (light.type){
 		//Directional light
 		case LIGHT_TYPE_DIRECTIONAL:{
-				glLightfv(lightSource, GL_POSITION,		light_direction);
+				light_position[3] = 0.0;
+				glLightfv(lightSource, GL_POSITION,		light_position);
 				glLightf (lightSource, GL_SPOT_CUTOFF,	180.0);
 			}
 			break;
 		//Positional light
 		case LIGHT_TYPE_POINT:{
+				light_position[3] = 1.0;
 				glLightfv(lightSource, GL_POSITION,		light_position);
 				glLightf (lightSource, GL_SPOT_CUTOFF,	180.0);
 			 }
 			break;
 		//Spot light
 		case LIGHT_TYPE_SPOT:{
+				light_position[3] = 1.0;
 				glLightfv(lightSource, GL_POSITION,		light_position);
 				glLightfv(lightSource, GL_SPOT_DIRECTION, light_direction);
 
