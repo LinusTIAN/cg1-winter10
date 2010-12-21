@@ -1,7 +1,7 @@
 #pragma once
 #include "My3dObject.h"
 
-class MyFileData
+class MyFileData: public MyGlDrawable
 {
 public:
 	MyFileData(void);
@@ -10,12 +10,11 @@ public:
 	My3dObject **m_objects;
 	int m_nextObj;
 	int m_arrSize;
-	MyBoundingBox bbox;
 
 public:
 	void addObjectRef(My3dObject* obj);
-	void draw(bool torchEnabled, bool showFaceNormals, bool showVertexNormals, bool recompile = false);
-	void drawBoundingBox();
+	void Draw();
+	void Draw(bool torchEnabled, bool showFaceNormals, bool showVertexNormals, bool recompile = false);
 	void init(bool showFaceNormals, bool showVertexNormals);
 	void changeColor(int r,int g,int b);
 };

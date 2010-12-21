@@ -435,7 +435,7 @@ void COpenGLView::OnDraw(CDC* pDC)
 	setupLightInScene();
 	m_fogFarams.setupFog();
 	m_materialManager.setupMaterialInScene();
-	m_textureManager.setupTexture(m_materialManager);
+	m_textureManager.setupGeneralTextureParams(m_materialManager);
 	
 
 	// Shading
@@ -579,14 +579,14 @@ void COpenGLView::draw_axis()
 void COpenGLView::RenderScene() {
 	if (s_fileData != NULL)
 	{
-		s_fileData->draw(torchEnabled, m_showFaceNormals, m_showVertexNormals,m_recompile);
+		s_fileData->Draw(torchEnabled, m_showFaceNormals, m_showVertexNormals,m_recompile);
 	
 		m_recompile = false;
 
 		if (m_showBoundingBox){
 			glDisable(GL_LIGHTING);
 			glColor3f(1, 0, 0);
-			s_fileData->drawBoundingBox();
+			s_fileData->DrawBoundingBox();
 		}
 	}
 	return;
@@ -602,8 +602,6 @@ void COpenGLView::OnFileLoad()
 	if (dlg.DoModal () == IDOK) {
 		delete s_fileData;
 		s_fileData = new MyFileData();
-
-		
 
 		m_strItdFileName = dlg.GetPathName();		// Full path and filename
 		PngWrapper p;
@@ -1438,8 +1436,11 @@ void COpenGLView::OnMaterialLoadtexture()
 	if (dlg.DoModal () == IDOK) {
 		std::string file(dlg.GetPathName());
 
+		m_textureManager.addPTexture(file.c_str(), true);
+		m_textureManager.set();
+
 		for (int i=0; i<s_fileData->m_nextObj; i++){
-			s_fileData->m_objects[i]->addPTexture(file.c_str(), true);
+			s_fileData->m_objects[i]->enableTexture(false);
 		}
 		m_recompile = true;
 		Invalidate();

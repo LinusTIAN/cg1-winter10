@@ -17,6 +17,7 @@ public:
 	void DrawNormals(bool faceNormals, bool vertexNormals);
 
 	void addPTexture(const char *str, bool fullPath);
+	void enableTexture(bool enable);
 
 	/* get a display-list index for the list that draws the requested normals. a */
 	int GetNormalsDisplayList(bool faceNormals, bool vertexNormals, bool recompile = false);
@@ -38,7 +39,5 @@ private:
 	int arrSize;
 	int m_NormalsDisplayList[4];	// holds a display list for each of the 4 possible combinations
 									// of normal-drawing settings (off/off, on/off etc...)
-	bool m_showTexture;
-	GLuint m_textureName;
 	MyTextureManager m_textureManager;
 };

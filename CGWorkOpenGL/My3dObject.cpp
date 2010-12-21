@@ -6,7 +6,6 @@
 
 My3dObject::My3dObject(int nPolygons)
 {
-	m_showTexture = false;
 	nextPoly = 0;
 	arrSize = nPolygons;
 
@@ -32,12 +31,11 @@ My3dObject::~My3dObject(void)
 
 void My3dObject::Draw(void)
 {
+	m_textureManager.set();
+
 	glColor3d(m_color[0], m_color[1], m_color[2]);
 
 	for (int i=0; i<nextPoly; i++){
-		if (m_showTexture){
-			m_polygons[i]->setTexture(m_textureName);
-		}
 		m_polygons[i]->Draw();
 	}
 }
@@ -106,7 +104,9 @@ void My3dObject::PopPostEffect()
 
 
 void My3dObject::addPTexture(const char *str, bool fullPath){
-	m_textureName = m_textureManager.addPTexture(str, fullPath);
-	if (m_textureName >0)
-		m_showTexture = true;
+	m_textureManager.addPTexture(str, fullPath);
+}
+
+void My3dObject::enableTexture(bool enable){
+	m_textureManager.enable( enable );
 }

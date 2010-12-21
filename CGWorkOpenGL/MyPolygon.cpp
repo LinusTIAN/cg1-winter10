@@ -10,8 +10,6 @@
 MyPolygon::MyPolygon(int nVertices, int norm_x, int norm_y, int norm_z)
 	:	normal(norm_x, norm_y, norm_z)
 {
-	m_showTexture = false;
-	m_texture = 0;
 	m_vertices = new MyVertex[nVertices];
 	if (NULL == m_vertices)
 		throw std::bad_alloc("Cannot allocate vertices array");
@@ -30,60 +28,31 @@ MyPolygon::~MyPolygon(void)
 	delete [] m_vertices;
 }
 
-void MyPolygon::setTexture(GLuint texture){
-	m_texture = texture;
-	m_showTexture = true;
-}
-
 void MyPolygon::Draw(void)
 {
-	if (m_showTexture){
-		glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);//GL_DECAL);
-		glBindTexture(GL_TEXTURE_2D,m_texture);
-	}
-	else{
-		glDisable(GL_TEXTURE_2D);
-	}
-
 	glBegin(GL_POLYGON);
-	
-	for (int i=0; i < nextVertex; i++)
 	{
-		if (torchEnabled)
+		for (int i=0; i < nextVertex; i++)
 		{
-			// find the distance of the point from mouse cursor and set the color accordingly
-			double	dx = m_vertices[i].x - cursor_x,
-					dy = m_vertices[i].y - cursor_y,
-					dz = m_vertices[i].z - cursor_z,
-					d = sqrt(dx*dx + dy*dy + dz*dz),
-					shade = 1 - (d/torch_range);
+			if (torchEnabled)
+			{
+				// find the distance of the point from mouse cursor and set the color accordingly
+				double	dx = m_vertices[i].x - cursor_x,
+						dy = m_vertices[i].y - cursor_y,
+						dz = m_vertices[i].z - cursor_z,
+						d = sqrt(dx*dx + dy*dy + dz*dz),
+						shade = 1 - (d/torch_range);
 
-			if (shade < 0.1)//was 0.035
-				shade = 0.1;	// maintain /some/ ambient light...
+				if (shade < 0.1)//was 0.035
+					shade = 0.1;	// maintain /some/ ambient light...
 
-			glColor3d(shade, shade, shade);
+				glColor3d(shade, shade, shade);
+			}
+
+			m_vertices[i].Draw();
 		}
-
-		//Draw texture		
-		//if (m_showTexture)
-		{
-			//if (nextVertex !=4)
-			//	assert(0);
-			
-		}
-		
-
-		//Draw vertex
-		//glVertex3d(m_vertices[i].x, m_vertices[i].y, m_vertices[i].z);
-		m_vertices[i].Draw();
 	}
-
 	glEnd();
-
-	//glFlush();
-   glDisable(GL_TEXTURE_2D);
-
 }
 
 void MyPolygon::AddVertex(MyVertex& v)

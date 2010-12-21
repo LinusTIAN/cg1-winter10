@@ -10,11 +10,21 @@ public:
 	~MyTextureManager(void);
 
 
-	int addPTexture(const char *str, bool fullPath);
-	void setupTexture(MyMaterialManager& materialManager);
+	void addPTexture(const char *str, bool fullPath);
+	void setupGeneralTextureParams(MyMaterialManager& materialManager);
+	void set();
+	void enable(bool enable);
 
 private:
-	int bindTexture(PngWrapper* wrapper);
+	void bindTexture(PngWrapper* wrapper);
+	
+private:
+	int m_sWidth, m_sHeight;
+	unsigned int m_texture;
+	unsigned char* m_sImage;
+	bool m_showTexture;
+	bool m_enabled;
+	//PngWrapper m_wrapper;
 	
 	
 // Find the largest power of two that is
