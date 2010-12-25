@@ -9,7 +9,7 @@ class CPerspectiveOptionsDialog : public CDialog
 	DECLARE_DYNAMIC(CPerspectiveOptionsDialog)
 
 public:
-	CPerspectiveOptionsDialog(int dVal, CWnd* pParent = NULL);   // standard constructor
+	CPerspectiveOptionsDialog(double dVal, CWnd* pParent = NULL);   // standard constructor
 	virtual ~CPerspectiveOptionsDialog();
 
 // Dialog Data

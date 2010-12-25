@@ -20,8 +20,6 @@ public:
 	// you can specify normal length to draw implicitly or let it be calculated relative to
 	// the size of the face
 	void DrawNormals(bool faceNormal, bool vertexNormals, double size = 0);
-	// post-effect options are saved globally - last call to PushPostEffect decides!
-	void PushPostEffect(MyPostEffect* fx, long flags);
 
 	static const int PFX_VERTICES	= 0x1;
 	static const int PFX_FACES		= 0x2;

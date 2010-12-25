@@ -12,7 +12,7 @@ MyMaterialManager::~MyMaterialManager(void)
 }
 
 void MyMaterialManager::setupMaterialInScene(){
-	GLfloat mat_shininess[] = { m_shininess };
+	GLfloat mat_shininess[] = { (GLfloat) m_shininess };
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
 	
 	GLfloat mat_specular[] = { m_specular, m_specular, m_specular, 1.0 };
@@ -27,8 +27,8 @@ void MyMaterialManager::setupMaterialInScene(){
 
 void MyMaterialManager::reset(){
 
-	m_ambient = 0.2;
-    m_diffuse = 0.8;
+	m_ambient = 0.2f;
+    m_diffuse = 0.8f;
     m_specular = 1.0;
 	m_shininess = 32;
 

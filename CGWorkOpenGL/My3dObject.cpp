@@ -60,21 +60,22 @@ void My3dObject::AddPolyRef(MyPolygon* p)
 	bbox.update(p->bbox);
 }
 
-void My3dObject::DrawNormals(bool faceNormals, bool vertexNormals)
+void My3dObject::DrawNormals(bool faceNormals, bool vertexNormals, double normSize)
 {
 	double self_size = min( bbox.xSize(), bbox.ySize() );
 	self_size = min( self_size, bbox.zSize() );
 
-	double norm_size = self_size / 30;	// we draw normals 1/10 the size of the model
+	if (normSize <= 0)
+		normSize = self_size / 10;	// we draw normals 1/10 the size of the model by default
 
 	for (int i = 0; i < nextPoly; i++)
 	{
 		// for each polygon
-		m_polygons[i]->DrawNormals(faceNormals, vertexNormals, norm_size);
+		m_polygons[i]->DrawNormals(faceNormals, vertexNormals, normSize);
 	}
 }
 
-int My3dObject::GetNormalsDisplayList(bool faceNormals, bool vertexNormals, bool recompile)
+int My3dObject::GetNormalsDisplayList(bool faceNormals, bool vertexNormals, double normSize, bool recompile)
 {
 	int i = ((faceNormals ? 1 : 0) << 1) | (vertexNormals ? 1 : 0);
 
@@ -83,25 +84,12 @@ int My3dObject::GetNormalsDisplayList(bool faceNormals, bool vertexNormals, bool
 		// if we're recompiling where a list already exists, reuse the old index:
 		m_NormalsDisplayList[i] = (m_NormalsDisplayList[i] >= 0) ? m_NormalsDisplayList[i] : glGenLists(1);
 		glNewList(m_NormalsDisplayList[i], GL_COMPILE);
-			this->DrawNormals(faceNormals, vertexNormals);
+			this->DrawNormals(faceNormals, vertexNormals, normSize);
 		glEndList();
 	}
 
 	return m_NormalsDisplayList[i];
 }
-
-void My3dObject::PushPostEffect(MyPostEffect* fx, long flags)
-{
-	for (int i = 0; i < nextPoly; i++)
-		m_polygons[i]->PushPostEffect(fx, flags);
-}
-
-void My3dObject::PopPostEffect()
-{
-	for (int i = 0; i < nextPoly; i++)
-		m_polygons[i]->PopPostEffect();
-}
-
 
 void My3dObject::addPTexture(const char *str, bool fullPath){
 	m_textureManager.addPTexture(str, fullPath);

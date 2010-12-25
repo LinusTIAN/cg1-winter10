@@ -270,7 +270,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MyFileData.cpp"
+				RelativePath=".\MyCompositeObject.cpp"
 				>
 			</File>
 			<File
@@ -473,7 +473,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\MyFileData.h"
+				RelativePath=".\MyCompositeObject.h"
 				>
 			</File>
 			<File
@@ -666,6 +666,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\ClassDiagram1.cd"
+			>
+		</File>
 		<File
 			RelativePath="ReadMe.txt"
 			>

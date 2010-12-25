@@ -10,7 +10,7 @@
 
 IMPLEMENT_DYNAMIC(CPerspectiveOptionsDialog, CDialog)
 
-CPerspectiveOptionsDialog::CPerspectiveOptionsDialog(int dVal, CWnd* pParent /*=NULL*/)
+CPerspectiveOptionsDialog::CPerspectiveOptionsDialog(double dVal, CWnd* pParent /*=NULL*/)
 	: CDialog(CPerspectiveOptionsDialog::IDD, pParent)
 	, m_dVal(_T(""))
 {

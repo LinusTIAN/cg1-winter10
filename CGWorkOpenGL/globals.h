@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MyFileData.h"
+#include "MyCompositeObject.h"
 
-extern MyFileData *s_fileData;
+extern MyCompositeObject *objectData;
 extern double	cursor_x,
 				cursor_y,
 				cursor_z;

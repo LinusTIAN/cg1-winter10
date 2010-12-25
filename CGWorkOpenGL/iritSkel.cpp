@@ -130,12 +130,13 @@ bool CGSkelStoreData(IPObjectStruct *PObj)
 	if (CGSkelGetObjectColor(PObj, RGB))
 	{
 		for (int j=0; j<3; j++)
-				newObj->m_color[j] = RGB[j];
+			newObj->m_color[j] = RGB[j];
 	}
 	else{
 		for (int j=0; j<3; j++)
-				newObj->m_color[j] = 1;
+			newObj->m_color[j] = 1.0;
 	}
+
 	if (CGSkelGetObjectTransp(PObj, &Transp))
 	{
 		newObj->m_transp = Transp;
@@ -148,6 +149,7 @@ bool CGSkelStoreData(IPObjectStruct *PObj)
 	{
 		newObj->addPTexture(Str,false);
 	}
+
 	if (Attrs != NULL) 
 	{
 		printf("[OBJECT\n");
@@ -156,10 +158,11 @@ bool CGSkelStoreData(IPObjectStruct *PObj)
 			Attrs = AttrTraceAttributes(Attrs, NULL);
 		}
 	}
+
 	for (PPolygon = PObj -> U.Pl; PPolygon != NULL;	PPolygon = PPolygon -> Pnext) 
 	{
 			if (PPolygon -> PVertex == NULL) {
-				AfxMessageBox("Dump: Attemp to dump empty polygon");
+				AfxMessageBox("Dump: Attempt to dump empty polygon");
 				delete newObj;
 				return false;
 			}
@@ -176,20 +179,18 @@ bool CGSkelStoreData(IPObjectStruct *PObj)
 			PVertex = PPolygon -> PVertex;
 			do {			     /* Assume at least one edge in polygon! */
 				MyVertex v(PVertex->Coord[0], PVertex->Coord[1], PVertex->Coord[2]);
+
 				//Add Normal
-				if(IP_HAS_NORMAL_VRTX(PVertex)){
+				if(IP_HAS_NORMAL_VRTX(PVertex)) {
 					v.setNormal(PVertex->Normal[0],PVertex->Normal[1],PVertex->Normal[2]);
-					
-				}
-				else{
+				} else {
 					AfxMessageBox("No Normals!!");
 				}
 
 				// Add UV
-				if(PVertex->Attr && PVertex->Attr->Type==IP_ATTR_UV){
+				if(PVertex->Attr && PVertex->Attr->Type==IP_ATTR_UV) {
 					v.setUV(PVertex->Attr->U.UV[0], PVertex->Attr->U.UV[1]);
-				}
-				else{
+				} else {
 					//AfxMessageBox("No UV!!");
 				}
 
@@ -198,11 +199,12 @@ bool CGSkelStoreData(IPObjectStruct *PObj)
 				PVertex = PVertex -> Pnext;
 			}
 			while (PVertex != PPolygon -> PVertex && PVertex != NULL);
-			/* Close the polygon. */
 
+			/* Close the polygon. */
 			newObj->AddPolyRef(poly);
 	}
-	s_fileData->addObjectRef(newObj);
+
+	objectData->addObjectRef(newObj);
 	/* Close the object. */
 	return true;
 }
