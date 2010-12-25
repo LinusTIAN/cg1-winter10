@@ -10,6 +10,8 @@
 MyPolygon::MyPolygon(int nVertices, int norm_x, int norm_y, int norm_z)
 	:	normal(norm_x, norm_y, norm_z)
 {
+	assert(nVertices > 2);
+
 	m_vertices = new MyVertex[nVertices];
 	if (NULL == m_vertices)
 		throw std::bad_alloc("Cannot allocate vertices array");

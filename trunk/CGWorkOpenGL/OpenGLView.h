@@ -16,7 +16,6 @@
 
 #include "Light.h"
 #include "atltypes.h"
-#include "MyTorchFX.h"
 #include "MyLight.h"
 #include "MyFogPrameters.h"
 #include "MyMaterialManager.h"

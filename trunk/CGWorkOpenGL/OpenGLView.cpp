@@ -374,7 +374,7 @@ BOOL COpenGLView::SetupViewingFrustum(void)
 	int e = ::glGetError();
 	if ( e != GL_NO_ERROR ) {
 		CString msg;
-		msg.Format("Error while trying to set viewing frustum: %d", e);
+		msg.Format("Error while trying to set viewing frustum: %x", e);
 		::AfxMessageBox(msg);
 		return FALSE;
 	}
@@ -404,8 +404,11 @@ BOOL COpenGLView::SetupViewingOrthoConstAspect(void)
 			this->m_zNear, this->m_zFar);
 	}
 
-	if ( GL_NO_ERROR != ::glGetError() ) {
-		::AfxMessageBox("Error while trying to set viewing frustum.");
+	int e = ::glGetError();
+	if ( e != GL_NO_ERROR ) {
+		CString msg;
+		msg.Format("Error while trying to set viewing frustum: %x", e);
+		::AfxMessageBox(msg);
 		return FALSE;
 	}
 

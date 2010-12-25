@@ -21,9 +21,6 @@ public:
 	// the size of the face
 	void DrawNormals(bool faceNormal, bool vertexNormals, double size = 0);
 
-	static const int PFX_VERTICES	= 0x1;
-	static const int PFX_FACES		= 0x2;
-
 private:
 	int nextVertex;	// points to first unused index in vertex array
 	bool normalInitialized;	// is normal given in constructor or to be calculated?
