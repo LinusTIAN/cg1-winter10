@@ -896,11 +896,13 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (torchEnabled && objectData != NULL)
 	{
+		// move torch
 		static const double scale_factor = 1;
 
 		SHORT s = GetKeyState(VK_CONTROL);
 		if ( GetKeyState(VK_CONTROL) & (1 << (sizeof(SHORT)*CHAR_BIT)) )
 		{
+			// check if CTRL is down to decide whether to move the torch on Z-axis or not
 			CPoint point;
 			GetCursorPos(&point);	// GetCursorPos seems to return different coordinates than OnMouseMove,
 									// so we override the point parameter for this part of the code so we
@@ -1020,9 +1022,6 @@ void COpenGLView::RotateModel(double x_amt, double y_amt)
 	double	rotate_amt = (x_amt + y_amt) * factor,
 			rotate_axis_x, rotate_axis_y, rotate_axis_z;
 
-	
-
-
 	switch (m_nAxis)
 	{
 	case ID_AXIS_X:
@@ -1050,8 +1049,35 @@ void COpenGLView::RotateModel(double x_amt, double y_amt)
 		// view-space transformation
 		GLdouble currentMatrix[16];
 		glGetDoublev(GL_MODELVIEW_MATRIX, &currentMatrix[0]);
+
+		const double cp[4] = {0, 0, 0, 1.0};
+		double	cp1[4] = {0};
+
+		// find the current projected axes origin
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++)
+				cp1[i] += cp[j] * currentMatrix[i + 4*j];
+		for (int i = 0; i < 4; i++) cp1[i] /= cp1[3];
+
 		glLoadIdentity();
 		glRotated(rotate_amt, rotate_axis_x, rotate_axis_y, rotate_axis_z);
+		glMultMatrixd(&currentMatrix[0]);
+
+		double cp2[4] = {0};
+
+		// find the new projected axes origin
+		glGetDoublev(GL_MODELVIEW_MATRIX, &currentMatrix[0]);
+		for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++)
+				cp2[i] += cp[j] * currentMatrix[i + 4*j];
+		for (int i = 0; i < 4; i++) cp2[i] /= cp2[3];
+
+		/*	figure out how much the object has moved as the result of the rotation about
+			the axis, and move it the same amount in the other direction -- in viewspace
+			coordinates! this is so the object rotates in viewspace coordinates but remains
+			centered in the viewport */
+		glLoadIdentity();
+		glTranslated(cp1[0] - cp2[0], cp1[1] - cp2[1], cp1[2] - cp2[2]);
 		glMultMatrixd(&currentMatrix[0]);
 	}
 }
