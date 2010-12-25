@@ -371,8 +371,11 @@ BOOL COpenGLView::SetupViewingFrustum(void)
 	// parallel projections. No matter what you use, check
 	// the error status when you set the viewing frustum!
 
-	if ( GL_NO_ERROR != ::glGetError() ) {
-		::AfxMessageBox("Error while trying to set viewing frustum.");
+	int e = ::glGetError();
+	if ( e != GL_NO_ERROR ) {
+		CString msg;
+		msg.Format("Error while trying to set viewing frustum: %d", e);
+		::AfxMessageBox(msg);
 		return FALSE;
 	}
 
