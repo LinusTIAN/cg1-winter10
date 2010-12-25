@@ -1,0 +1,87 @@
+#include "MyCompositeObject.h"
+
+MyCompositeObject::MyCompositeObject(void)
+{
+	m_arrSize = 20;
+	m_objects = new My3dObject*[m_arrSize];
+	m_nextObj = 0;
+}
+
+MyCompositeObject::~MyCompositeObject(void)
+{
+	for (m_nextObj--; m_nextObj >= 0; m_nextObj--)
+		delete m_objects[m_nextObj];
+	delete [] m_objects;
+}
+
+
+void MyCompositeObject::addObjectRef(My3dObject* obj)
+{
+	if (m_arrSize <= m_nextObj )
+	{
+		// reallocate with more memory
+		My3dObject **new_mem = new My3dObject*[m_arrSize*2];
+		if (NULL == new_mem){
+			throw std::bad_alloc("Cannot allocate objects array");
+		}
+		std::memcpy(new_mem, m_objects, m_nextObj*sizeof(My3dObject*));
+		delete [] m_objects;
+		m_objects = new_mem;
+
+		m_arrSize *= 2;
+	}
+
+	m_objects[m_nextObj++] = obj;
+	
+	bbox.update(obj->bbox);
+}
+
+void MyCompositeObject::Draw(void)
+{
+	for (int i = 0; i < m_nextObj; i++) {
+		m_objects[i]->Draw();
+	}
+}
+
+void MyCompositeObject::changeColor(double r, double g, double b)
+{
+	for (int i=0; i < m_nextObj; i++){
+		m_objects[i]->m_color[0] = r;
+		m_objects[i]->m_color[1] = g;
+		m_objects[i]->m_color[2] = b;
+	}
+}
+
+void MyCompositeObject::DrawNormals(bool faceNormals, bool vertexNormals)
+{
+	if (!faceNormals && !vertexNormals)
+		return;
+
+	double self_size = min( bbox.xSize(), bbox.ySize() );
+	self_size = min( self_size, bbox.zSize() );
+
+	double norm_size = self_size / 10;	// we draw normals 1/10 the size of the model
+
+	for (int i = 0; i < m_nextObj; i++)
+	{
+		// for each sub-object
+		m_objects[i]->DrawNormals(faceNormals, vertexNormals, norm_size);
+	}
+}
+
+int MyCompositeObject::GetNormalsDisplayList(bool faceNormals, bool vertexNormals, bool recompile)
+{
+	int i = ((faceNormals ? 1 : 0) << 1) | (vertexNormals ? 1 : 0);
+
+	if (m_NormalsDisplayList[i] < 0 || recompile)
+	{
+		// if we're recompiling where a list already exists, reuse the old index:
+		m_NormalsDisplayList[i] = (m_NormalsDisplayList[i] >= 0) ? m_NormalsDisplayList[i] : glGenLists(1);
+		glNewList(m_NormalsDisplayList[i], GL_COMPILE);
+			this->DrawNormals(faceNormals, vertexNormals);
+		glEndList();
+	}
+
+	return m_NormalsDisplayList[i];
+}
+
