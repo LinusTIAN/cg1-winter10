@@ -57,13 +57,3 @@ void MyGlDrawable::DrawBoundingBox(void)
 		glVertex3d(bbox.x_max, bbox.y_max, bbox.z_max);
 	glEnd();
 }
-
-void MyGlDrawable::PushPostEffect(MyPostEffect* fx, long flags)
-{
-	postEffects.push_front(fx);
-}
-
-void MyGlDrawable::PopPostEffect(void)
-{
-	postEffects.pop_back();
-}

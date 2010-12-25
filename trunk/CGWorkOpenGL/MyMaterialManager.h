@@ -12,13 +12,13 @@ public:
 public:
 	
     // ambient property of the material
-    double m_ambient;
+    float m_ambient;
     // Diffuse property of the material
-    double m_diffuse;
+    float m_diffuse;
     // shininess property of the material
     int m_shininess;
     // specular property of the material (integer values only)
-    double m_specular;
+    float m_specular;
 
 	bool m_sRepeat;
 	bool m_tRepeat;

@@ -16,9 +16,9 @@ static char THIS_FILE[] = __FILE__;
 
 /////////////////////////////////////////////////////////////////////////////
 // PROGRAM GLOBALS AREA
-#include "MyFileData.h"
+#include "MyCompositeObject.h"
 
-MyFileData* s_fileData = NULL;
+MyCompositeObject* objectData = NULL;
 
 double	cursor_x,
 		cursor_y,

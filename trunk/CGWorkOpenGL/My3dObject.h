@@ -14,15 +14,12 @@ public:
 	   POINTER YOURSELF! THE CLASS NEEDS IT AND WILL TAKE CARE OF DELETING IT ON DESTRUCTION */
 	void AddPolyRef(MyPolygon* p);
 	void Draw(void);
-	void DrawNormals(bool faceNormals, bool vertexNormals);
+	void DrawNormals(bool faceNormals, bool vertexNormals, double normSize = 0);
+	/* get a display-list index for the list that draws the requested normals */
+	int GetNormalsDisplayList(bool faceNormals, bool vertexNormals, double normSize = 0, bool recompile = false);
 
 	void addPTexture(const char *str, bool fullPath);
 	void enableTexture(bool enable);
-
-	/* get a display-list index for the list that draws the requested normals. a */
-	int GetNormalsDisplayList(bool faceNormals, bool vertexNormals, bool recompile = false);
-	void PushPostEffect(MyPostEffect* fx, long flags = 0);
-	void PopPostEffect();
 
 	MyPolygon **m_polygons;
 	double m_color[3],

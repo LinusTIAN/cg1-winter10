@@ -468,7 +468,7 @@ void COpenGLView::OnDraw(CDC* pDC)
 
 
 
-	if (s_fileData == NULL)
+	if (objectData == NULL)
 	{
 		// draw just the axis
 		glPushMatrix();
@@ -577,18 +577,26 @@ void COpenGLView::draw_axis()
 
 
 void COpenGLView::RenderScene() {
-	if (s_fileData != NULL)
+	if (objectData != NULL)
 	{
-		s_fileData->Draw(torchEnabled, m_showFaceNormals, m_showVertexNormals,m_recompile);
-	
-		m_recompile = false;
+		if (m_recompile)
+		{
+			// re-compile display lists
+			objectData->GetDisplayList(true);
+			objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals, true);
+			m_recompile = false;
+		}
+
+		glCallList( objectData->GetDisplayList() );
+		glCallList( objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals) );
 
 		if (m_showBoundingBox){
 			glDisable(GL_LIGHTING);
 			glColor3f(1, 0, 0);
-			s_fileData->DrawBoundingBox();
+			objectData->DrawBoundingBox();
 		}
 	}
+
 	return;
 }
 
@@ -600,8 +608,8 @@ void COpenGLView::OnFileLoad()
 	CFileDialog dlg(TRUE, "itd", "*.itd", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY ,szFilters);
 
 	if (dlg.DoModal () == IDOK) {
-		delete s_fileData;
-		s_fileData = new MyFileData();
+		delete objectData;
+		objectData = new MyCompositeObject();
 
 		m_strItdFileName = dlg.GetPathName();		// Full path and filename
 		PngWrapper p;
@@ -611,7 +619,9 @@ void COpenGLView::OnFileLoad()
 
 		this->GetDocument()->SetTitle(m_strItdFileName);	// display the loaded file name in the title bar
 
-		s_fileData->init(m_showFaceNormals, m_showVertexNormals);
+		// pre-compile display list
+		objectData->GetDisplayList(true);
+		objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals, true);
 
 		OnFileReset();
 		materialReset();
@@ -881,7 +891,7 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 {
 	bool mustRedraw = false;
 
-	if (torchEnabled && s_fileData != NULL)
+	if (torchEnabled && objectData != NULL)
 	{
 		static const double scale_factor = 1;
 
@@ -921,10 +931,10 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 
 		double objSize;
 
-		if (s_fileData != NULL)
+		if (objectData != NULL)
 		{
-			objSize = max(s_fileData->bbox.xSize(), s_fileData->bbox.ySize());
-			objSize = max(objSize, s_fileData->bbox.zSize());
+			objSize = max(objectData->bbox.xSize(), objectData->bbox.ySize());
+			objSize = max(objSize, objectData->bbox.zSize());
 		} else 
 		{
 			objSize = 2;
@@ -1051,10 +1061,10 @@ void COpenGLView::ScaleModel(double x_amt, double y_amt)
 
 	double objSize;
 
-	if (s_fileData != NULL)
+	if (objectData != NULL)
 	{
-		objSize = max(s_fileData->bbox.xSize(), s_fileData->bbox.ySize());
-		objSize = max(objSize, s_fileData->bbox.zSize());
+		objSize = max(objectData->bbox.xSize(), objectData->bbox.ySize());
+		objSize = max(objSize, objectData->bbox.zSize());
 	} else 
 	{
 		objSize = 2;
@@ -1112,12 +1122,12 @@ bool COpenGLView::SetupCamera(bool resetTransforms)
 	this->m_zNear = 0.1,
 	this->m_zFar = 20.0;
 	
-	if (s_fileData != NULL)
+	if (objectData != NULL)
 	{
 		// near clipping plane is 10 times the size of the object
 		// this should give us plenty of room to back away until it clips
-		//this->m_zFar = s_fileData->bbox.zSize() * 10;
-		this->m_zFar = 100*(s_fileData->bbox.xSize() + s_fileData->bbox.ySize() + s_fileData->bbox.zSize());
+		//this->m_zFar = objectData->bbox.zSize() * 10;
+		this->m_zFar = 100*(objectData->bbox.xSize() + objectData->bbox.ySize() + objectData->bbox.zSize());
 	}
 
 	bool ret;
@@ -1143,7 +1153,7 @@ bool COpenGLView::SetupCamera(bool resetTransforms)
 		glPushMatrix();
 		glPushMatrix();
 
-		if (s_fileData != NULL && !m_bIsPerspective)
+		if (objectData != NULL && !m_bIsPerspective)
 		{
 			// scale the model so it fits on  about 3/4 of the screen
 			// (only in ortho view - in perspective view we move it on z axis instead and that scales the object)
@@ -1158,9 +1168,9 @@ bool COpenGLView::SetupCamera(bool resetTransforms)
 			glGetDoublev(GL_PROJECTION_MATRIX, &projMatrix[0]);
 			glGetIntegerv(GL_VIEWPORT, &viewportMatrix[0]);
 			
-			gluProject(	s_fileData->bbox.x_min, s_fileData->bbox.y_min, s_fileData->bbox.z_min,
+			gluProject(	objectData->bbox.x_min, objectData->bbox.y_min, objectData->bbox.z_min,
 						modelMatrix, projMatrix, viewportMatrix, &w_xmin, &w_ymin, &w_zmin);
-			gluProject(	s_fileData->bbox.x_max, s_fileData->bbox.y_max, s_fileData->bbox.z_max,
+			gluProject(	objectData->bbox.x_max, objectData->bbox.y_max, objectData->bbox.z_max,
 						modelMatrix, projMatrix, viewportMatrix, &w_xmax, &w_ymax, &w_zmax);
 
 			MyBoundingBox w_bbox(w_xmin, w_xmax, w_ymin, w_ymax, w_zmin, w_zmax);
@@ -1179,23 +1189,23 @@ bool COpenGLView::SetupCamera(bool resetTransforms)
 
 		double distance = 3.0;	// default distance if no object is loaded (for the axes)
 
-		if (s_fileData != NULL)
+		if (objectData != NULL)
 		{
 			// we take this opportunity to also center the model in the window
-			MyBoundingBox bbox = s_fileData->bbox;
+			MyBoundingBox bbox = objectData->bbox;
 			glTranslated( -bbox.GetCenterX(), -bbox.GetCenterY(), 0 );
 
 			double radFovY_half = M_PI/360 * c_humanYFov;
-			double	size_x = s_fileData->bbox.xSize(),
-					size_y = max( s_fileData->bbox.ySize(), size_x/m_AspectRatio );
+			double	size_x = objectData->bbox.xSize(),
+					size_y = max( objectData->bbox.ySize(), size_x/m_AspectRatio );
 
 			distance = (0.5*size_y) / std::sin(radFovY_half);
-			distance += s_fileData->bbox.zSize();	// don't forget the object isn't flat...
+			distance += objectData->bbox.zSize();	// don't forget the object isn't flat...
 			distance = distance * 2 / 3;	// don't want it to fill the whole screen
 		}
 
 		// get the size of the object (either loaded model or default axes) in the z plane
-		double zSize = (s_fileData != NULL) ? s_fileData->bbox.zSize() : 2;
+		double zSize = (objectData != NULL) ? objectData->bbox.zSize() : 2;
 
 		if (distance <= this->m_zNear + zSize)
 			// the object is clipping the near plane!
@@ -1232,14 +1242,15 @@ void COpenGLView::OnOptionsChangewirecolor()
 {
 	CColorDialog dlg;
 	if (dlg.DoModal () == IDOK) {
-		if(NULL != s_fileData){
+		if(NULL != objectData){
 			COLORREF color = dlg.GetColor();
-			s_fileData->changeColor(	GetRValue(color) / 255.0,
+			objectData->changeColor(	GetRValue(color) / 255.0,
 										GetGValue(color) / 255.0,
-										GetBValue(color) / 255.0);
+										GetBValue(color) / 255.0	);
 
-			// recompile the display list with the new color!
-			s_fileData->init(m_showFaceNormals, m_showVertexNormals);
+			// recompile the display lists with the new color!
+			objectData->GetDisplayList(true);
+			objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals, true);
 		
 			Invalidate();
 		}
@@ -1294,10 +1305,10 @@ void COpenGLView::OnUpdateOptionsShowfacesnormals(CCmdUI *pCmdUI)
 void COpenGLView::OnOptionsPerspectivecontrol()
 {
 	CPerspectiveOptionsDialog dlg(m_dVal);
-	if (dlg.DoModal () == IDOK) {
+	if (dlg.DoModal() == IDOK) {
 		CString val(dlg.m_dVal);//dlg.m_floatVal);
 		
-		float data = atof(val);
+		double data = atof(val);
 		if (data > 0){
 			m_dVal = data;
 		}
@@ -1356,7 +1367,7 @@ void COpenGLView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 void COpenGLView::OnFileReset()
 {
 	//lightReset();
-	if (s_fileData != NULL){
+	if (objectData != NULL){
 		m_backgroundColor[0] = m_backgroundColor[1] = m_backgroundColor[2] = 0;
 		// reset the ModelView matrix
 		glMatrixMode(GL_MODELVIEW);
@@ -1367,8 +1378,8 @@ void COpenGLView::OnFileReset()
 
 		SetupCamera(true);	// setup projection and camera position for the newly loaded model
 
-		double objSize = max( s_fileData->bbox.xSize(), s_fileData->bbox.ySize() );
-		objSize = max( objSize, s_fileData->bbox.zSize() );
+		double objSize = max( objectData->bbox.xSize(), objectData->bbox.ySize() );
+		objSize = max( objSize, objectData->bbox.zSize() );
 		torch_range = objSize / 4;
 
 		// set the "mouse z-coordinate" for the torch to coincide with the center of the object's
@@ -1382,10 +1393,11 @@ void COpenGLView::OnFileReset()
 		glGetIntegerv(GL_VIEWPORT, &viewportMatrix[0]);
 		double tmp;
 
-		gluProject(	s_fileData->bbox.GetCenterX(), s_fileData->bbox.GetCenterY(), s_fileData->bbox.GetCenterZ(),
+		gluProject(	objectData->bbox.GetCenterX(), objectData->bbox.GetCenterY(), objectData->bbox.GetCenterZ(),
 					modelMatrix, projMatrix, viewportMatrix,
 					&tmp, &tmp, &m_mouseScreenZ	);
 	}
+
 	Invalidate();	// force a WM_PAINT for drawing.
 }
 
@@ -1411,9 +1423,9 @@ void COpenGLView::setupLightInScene(){
 	glLoadIdentity();
 
 	m_lightManager.setupGeneralLight(	(!torchEnabled) && 
-									(s_fileData != NULL) && 
-									(m_nLightShading != ID_SHADING_WIREFRAME),
-									m_ambientLight);
+										(objectData != NULL) && 
+										(m_nLightShading != ID_SHADING_WIREFRAME),
+										m_ambientLight	);
 	for (int i=0;i<MAX_LIGHT; i++ ){
 		if (m_lights[i].space == LIGHT_SPACE_VIEW)
 			m_lightManager.showLight(m_lights[i], i);
@@ -1440,8 +1452,8 @@ void COpenGLView::OnMaterialLoadtexture()
 		m_textureManager.addPTexture(file.c_str(), true);
 		m_textureManager.set();
 
-		for (int i=0; i<s_fileData->m_nextObj; i++){
-			s_fileData->m_objects[i]->enableTexture(false);
+		for (int i=0; i<objectData->m_nextObj; i++){
+			objectData->m_objects[i]->enableTexture(false);
 		}
 		m_recompile = true;
 		Invalidate();
@@ -1467,8 +1479,8 @@ void COpenGLView::OnMaterialProperties()
 		m_textureManager.setupTextureParams(m_materialManager);
 		m_textureManager.set();
 
-		for (int i = 0; i< s_fileData->m_nextObj; i++){
-			s_fileData->m_objects[i]->m_textureManager.setupTextureParams(m_materialManager);
+		for (int i = 0; i < objectData->m_nextObj; i++){
+			objectData->m_objects[i]->m_textureManager.setupTextureParams(m_materialManager);
 		}
 
 		m_recompile = true;

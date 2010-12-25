@@ -59,7 +59,7 @@ private:
 	bool m_showFaceNormals;
 	bool m_recompile;
 	double m_backgroundColor[3];
-	float m_dVal;
+	double m_dVal;
 	MyFogPrameters m_fogFarams;
 	MyMaterialManager m_materialManager;
 	MyTextureManager m_textureManager;

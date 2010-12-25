@@ -74,7 +74,7 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper){
 
 	GLubyte* checkImage = new GLubyte[imageWidth*imageHeight*4*sizeof(GLubyte)];
 
-	int c,color;
+	int color;
 	for (int i = 0; i < imageHeight; i++) {
 		for (int j = 0; j < imageWidth; j++) {
 			color = wrapper->GetValue(j,i);

@@ -124,11 +124,3 @@ void MyPolygon::DrawNormals(bool faceNormal, bool vertexNormals, double size)
 		}
 	}
 }
-
-void MyPolygon::PushPostEffect(MyPostEffect* fx, long flags)
-{
-	pfx_PerFace = flags & PFX_FACES;
-	pfx_PerVertex = flags & PFX_VERTICES;
-
-	MyGlDrawable::PushPostEffect(fx);
-}
