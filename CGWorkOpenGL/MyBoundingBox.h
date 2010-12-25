@@ -45,7 +45,7 @@ public:
 		if (!initialized){
 			x_min = x; x_max = x;
 			y_min = y; y_max = y;
-			z_min = y; z_max = y;
+			z_min = z; z_max = z;
 			initialized = true;
 		}
 	

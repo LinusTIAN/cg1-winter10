@@ -183,8 +183,6 @@ bool CGSkelStoreData(IPObjectStruct *PObj)
 				//Add Normal
 				if(IP_HAS_NORMAL_VRTX(PVertex)) {
 					v.setNormal(PVertex->Normal[0],PVertex->Normal[1],PVertex->Normal[2]);
-				} else {
-					AfxMessageBox("No Normals!!");
 				}
 
 				// Add UV

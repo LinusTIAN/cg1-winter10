@@ -17,11 +17,6 @@ public:
 
 	void Draw();
 
-	MyBoundingBox GetBoundingBox()
-	{
-		return MyBoundingBox(x,x,y,y,z,z);
-	}
-
 public:
 	double x, y, z;
 	MyVector normal;
