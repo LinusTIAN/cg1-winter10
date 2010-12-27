@@ -139,7 +139,7 @@ bool CGSkelStoreData(IPObjectStruct *PObj)
 
 	if (CGSkelGetObjectTransp(PObj, &Transp))
 	{
-		newObj->m_transp = Transp;
+		newObj->m_alpha = 1 - Transp;
 	}
 	if ((Str = CGSkelGetObjectTexture(PObj)) != NULL)
 	{

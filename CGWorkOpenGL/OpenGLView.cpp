@@ -143,7 +143,7 @@ COpenGLView::COpenGLView()
 	m_nAxis = ID_AXIS_X;
 	m_nAction = ID_ACTION_ROTATE;
 	m_nView = ID_VIEW_ORTHOGRAPHIC;	
-	m_nSpace = ID_ACTION_OBJECTSPACE;
+	m_nSpace = ID_ACTION_VIEWSPACE;
 	m_bIsPerspective = false;
 
 	m_nLightShading = ID_LIGHT_SHADING_GOURAUD;
@@ -249,6 +249,9 @@ BOOL COpenGLView::InitializeOpenGL()
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	// Enable auto-normalize of vertex normals
 	glEnable(GL_NORMALIZE);
+	// Enable alpha-blending
+	glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// The code expects only the 2nd frame in the projection matrix to be used and the
 	// first one to always be the identity matrix, so make sure this is the case
@@ -374,7 +377,7 @@ BOOL COpenGLView::SetupViewingFrustum(void)
 	int e = ::glGetError();
 	if ( e != GL_NO_ERROR ) {
 		CString msg;
-		msg.Format("Error while trying to set viewing frustum: %x", e);
+		msg.Format("Error at %d while trying to set viewing frustum: %x", __LINE__, e);
 		::AfxMessageBox(msg);
 		return FALSE;
 	}
@@ -407,7 +410,7 @@ BOOL COpenGLView::SetupViewingOrthoConstAspect(void)
 	int e = ::glGetError();
 	if ( e != GL_NO_ERROR ) {
 		CString msg;
-		msg.Format("Error while trying to set viewing frustum: %x", e);
+		msg.Format("Error at %d while trying to set viewing frustum: %x", __LINE__, e);
 		::AfxMessageBox(msg);
 		return FALSE;
 	}
@@ -593,8 +596,10 @@ void COpenGLView::RenderScene() {
 			m_recompile = false;
 		}
 
-		glCallList( objectData->GetDisplayList() );
-		glCallList( objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals) );
+		glCallList( objectData->GetDisplayList(MyCompositeObject::SELECT_OPAQUE) );
+		glDepthMask(GL_FALSE);	// make z-buffer read-only for rendering transparent objects
+		glCallList( objectData->GetDisplayList(MyCompositeObject::SELECT_TRANSPARENT) );
+		glDepthMask(GL_TRUE);	// restore write permissions for z-buffer
 
 		if (m_showBoundingBox){
 			glDisable(GL_LIGHTING);
@@ -620,17 +625,16 @@ void COpenGLView::OnFileLoad()
 		m_strItdFileName = dlg.GetPathName();		// Full path and filename
 		PngWrapper p;
 
-		CGSkelProcessIritDataFiles(m_strItdFileName, 1);
-		// Open the file and read it.
+		CGSkelProcessIritDataFiles(m_strItdFileName, 1);	// Open the file and read it.
 
 		this->GetDocument()->SetTitle(m_strItdFileName);	// display the loaded file name in the title bar
+
+		OnFileReset();
+		materialReset();
 
 		// pre-compile display list
 		objectData->GetDisplayList(true);
 		objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals, true);
-
-		OnFileReset();
-		materialReset();
 	} 
 }
 
@@ -1398,7 +1402,6 @@ void COpenGLView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void COpenGLView::OnFileReset()
 {
-	//lightReset();
 	if (objectData != NULL){
 		m_backgroundColor[0] = m_backgroundColor[1] = m_backgroundColor[2] = 0;
 		// reset the ModelView matrix

@@ -17,11 +17,10 @@ MyGlDrawable::~MyGlDrawable(void)
 
 int MyGlDrawable::GetDisplayList(bool recompile)
 {
-	//recompile = true;
-	if (m_displayList < 0 || recompile)
+	if (m_displayList <= 0 || recompile)
 	{
 		// if we're recompiling where a list already exists, reuse the old index:
-		m_displayList = (m_displayList >= 0) ? m_displayList : glGenLists(1);
+		m_displayList = (m_displayList > 0) ? m_displayList : glGenLists(1);
 		glNewList(m_displayList, GL_COMPILE);
 			this->Draw();
 		glEndList();

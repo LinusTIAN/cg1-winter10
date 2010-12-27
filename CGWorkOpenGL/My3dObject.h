@@ -23,10 +23,7 @@ public:
 
 	MyPolygon **m_polygons;
 	double m_color[3],
-		   m_transp;
-
-	static const int PFX_VERTICES	= 0x1;
-	static const int PFX_FACES		= 0x2;
+		   m_alpha;
 
 public:
 	MyTextureManager m_textureManager;
