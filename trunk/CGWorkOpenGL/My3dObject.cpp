@@ -17,9 +17,10 @@ My3dObject::My3dObject(int nPolygons)
 	if (NULL == m_polygons)
 		throw std::bad_alloc("Cannot allocate polygons array");
 
-	
 	for (int i=0; i<3; i++)
-		m_color[i] = -1;	// color is uninitialized
+		m_color[i] = 1.0;	// default color is white
+
+	m_alpha = 1.0;	// opaque by default
 }
 
 My3dObject::~My3dObject(void)
@@ -33,7 +34,7 @@ void My3dObject::Draw(void)
 {
 	m_textureManager.set();
 
-	glColor3d(m_color[0], m_color[1], m_color[2]);
+	glColor4d(m_color[0], m_color[1], m_color[2], m_alpha);
 
 	for (int i=0; i<nextPoly; i++){
 		m_polygons[i]->Draw();
