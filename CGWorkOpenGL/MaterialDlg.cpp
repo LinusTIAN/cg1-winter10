@@ -34,10 +34,10 @@ CMaterialDlg::CMaterialDlg(MyMaterialManager& materialManager, CWnd* pParent /*=
 	
 	switch(materialManager.m_sType){
 	case  1:
-		m_sType = "Eye Linier";
+		m_sType = "Eye Linear";
 		break;
 	case 2:
-		m_sType = "Object Linier";
+		m_sType = "Object Linear";
 		break;
 	default:
 		m_sType = "Sphere Map";
@@ -47,10 +47,10 @@ CMaterialDlg::CMaterialDlg(MyMaterialManager& materialManager, CWnd* pParent /*=
 	
 	switch(materialManager.m_tType){
 	case  1:
-		m_tType = "Eye Linier";
+		m_tType = "Eye Linear";
 		break;
 	case 2:
-		m_tType = "Object Linier";
+		m_tType = "Object Linear";
 		break;
 	default:
 		m_tType = "Sphere Map";
@@ -100,22 +100,20 @@ MyMaterialManager& CMaterialDlg::getMaterialManager(){
 	m_materialManager.m_sAuto = m_sAuto;
 	m_materialManager.m_tAuto = m_tAuto;
 						
-	if (m_sType == "Eye Linier")
+	if (m_sType == "Eye Linear")
 		m_materialManager.m_sType = 1;
-	else if (m_sType == "Object Linier")
+	else if (m_sType == "Object Linear")
 		m_materialManager.m_sType = 2;
 	else
 		m_materialManager.m_sType = 3;
 
 
-	if (m_tType == "Eye Linier")
+	if (m_tType == "Eye Linear")
 		m_materialManager.m_tType = 1;
-	else if (m_tType == "Object Linier")
+	else if (m_tType == "Object Linear")
 		m_materialManager.m_tType = 2;
 	else
 		m_materialManager.m_tType = 3;
-
-
 
 	return m_materialManager;
 }
@@ -129,7 +127,18 @@ BOOL CMaterialDlg::OnInitDialog(){
 
 
 BEGIN_MESSAGE_MAP(CMaterialDlg, CDialog)
+	ON_EN_CHANGE(IDC_EDIT2, &CMaterialDlg::OnEnChangeEdit2)
 END_MESSAGE_MAP()
 
 
 // CMaterialDlg message handlers
+
+void CMaterialDlg::OnEnChangeEdit2()
+{
+	// TODO:  If this is a RICHEDIT control, the control will not
+	// send this notification unless you override the CDialog::OnInitDialog()
+	// function and call CRichEditCtrl().SetEventMask()
+	// with the ENM_CHANGE flag ORed into the mask.
+
+	// TODO:  Add your control notification handler code here
+}

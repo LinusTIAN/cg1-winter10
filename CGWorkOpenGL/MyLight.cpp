@@ -1,6 +1,20 @@
 #include "MyLight.h"
-
 #include "globals.h"
+
+// make sure the constants we need for specifying that specular highlights be applied
+// AFTER texture mapping are available
+#ifndef GL_LIGHT_MODEL_COLOR_CONTROL
+	#define GL_LIGHT_MODEL_COLOR_CONTROL 0x81F8
+#endif
+
+#ifndef GL_SINGLE_COLOR
+	#define GL_SINGLE_COLOR 0x81F9
+#endif
+
+#ifndef GL_SEPARATE_SPECULAR_COLOR
+	#define GL_SEPARATE_SPECULAR_COLOR 0x81FA
+#endif 
+
 
 MyLight::MyLight(void)
 {
@@ -29,6 +43,9 @@ void MyLight::setupGeneralLight(bool show, LightParams& params ){
 	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
 
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+
+	// maintain specular highlights in texture mode
+	glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR);
 
 	//glHint(GL_FRAGMENT_SHADER_DERIVATIVE_HINT, GL_NICEST);
 	//glHint(GL_PRESPECVITE_CORRECTION_HINT, GL_NICEST);
