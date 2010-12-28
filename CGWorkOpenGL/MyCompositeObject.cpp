@@ -15,6 +15,11 @@ MyCompositeObject::MyCompositeObject(void)
 
 MyCompositeObject::~MyCompositeObject(void)
 {
+	for (int i = 0; i < 4; i++)
+		if (m_NormalsDisplayList[i] > 0) glDeleteLists(m_NormalsDisplayList[i], 1);
+	for (int i = 0; i < 3; i++)
+		if (m_compDisplayLists[i] > 0) glDeleteLists(m_compDisplayLists[i], 1);
+
 	for (m_nextObj--; m_nextObj >= 0; m_nextObj--)
 		delete m_objects[m_nextObj];
 	delete [] m_objects;

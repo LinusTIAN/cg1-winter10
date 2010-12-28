@@ -24,8 +24,6 @@ public:
 	MyPolygon **m_polygons;
 	double m_color[3],
 		   m_alpha;
-
-public:
 	MyTextureManager m_textureManager;
 
 private:

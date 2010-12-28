@@ -16,7 +16,6 @@ public:
 	MyVector normal;
 	double c_x, c_y, c_z;	// center-point of polygon
 
-public:
 	// you can specify normal length to draw implicitly or let it be calculated relative to
 	// the size of the face
 	void DrawNormals(bool faceNormal, bool vertexNormals, double size = 0);
@@ -24,6 +23,4 @@ public:
 private:
 	int nextVertex;	// points to first unused index in vertex array
 	bool normalInitialized;	// is normal given in constructor or to be calculated?
-	bool pfx_PerFace,
-		 pfx_PerVertex;
 };
