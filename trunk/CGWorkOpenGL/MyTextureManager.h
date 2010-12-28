@@ -9,7 +9,6 @@ public:
 	MyTextureManager(void);
 	~MyTextureManager(void);
 
-
 	void addPTexture(const char *str, bool fullPath);
 	void setupTextureParams(MyMaterialManager& materialManager);
 	void set();

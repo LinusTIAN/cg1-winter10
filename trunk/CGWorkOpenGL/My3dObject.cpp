@@ -25,6 +25,9 @@ My3dObject::My3dObject(int nPolygons)
 
 My3dObject::~My3dObject(void)
 {
+	for (int i = 0; i < 4; i++)
+		if (m_NormalsDisplayList[i] > 0) glDeleteLists(m_NormalsDisplayList[i], 1);
+
 	for (nextPoly--; nextPoly >= 0; nextPoly--)
 		delete m_polygons[nextPoly];
 	delete [] m_polygons;

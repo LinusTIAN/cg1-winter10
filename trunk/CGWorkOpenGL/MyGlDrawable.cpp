@@ -11,7 +11,7 @@ MyGlDrawable::MyGlDrawable(void)
 
 MyGlDrawable::~MyGlDrawable(void)
 {
-	if (m_displayList >= 0)
+	if (m_displayList > 0)
 		glDeleteLists(m_displayList, 1);
 }
 
