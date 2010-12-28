@@ -4,7 +4,6 @@
 
 #include "MyPolygon.h"
 #include "MyVertex.h"
-#include "MyPostEffect.h"
 #include "globals.h"
 
 MyPolygon::MyPolygon(int nVertices, int norm_x, int norm_y, int norm_z)
@@ -19,8 +18,6 @@ MyPolygon::MyPolygon(int nVertices, int norm_x, int norm_y, int norm_z)
 	nextVertex = 0;
 
 	normalInitialized = (normal) ? true : false;
-
-	pfx_PerFace = pfx_PerVertex = false;
 
 	c_x = c_y = c_z = 0;
 }
