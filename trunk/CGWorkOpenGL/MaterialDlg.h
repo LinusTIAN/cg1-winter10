@@ -33,4 +33,7 @@ public:
 	BOOL m_tAuto;
 	CString m_sType;
 	CString m_tType;
+	afx_msg void OnEnChangeMaterialShininess();
+	afx_msg void OnEnChangeEdit2();
+	afx_msg void OnCbnSelchangeCombo1();
 };
