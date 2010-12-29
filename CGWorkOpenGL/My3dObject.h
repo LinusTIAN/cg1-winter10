@@ -24,6 +24,8 @@ public:
 	void addPTexture(const char *str, bool fullPath);
 	void enableTexture(bool enable);
 
+	void setTesselator(GLUtesselator* tesselator);
+
 	/** This is (optionally) the name of the object as it is stored in the IRIT model
 		file.
 	**/
@@ -39,4 +41,5 @@ private:
 	int arrSize;
 	int m_NormalsDisplayList[4];	// holds a display list for each of the 4 possible combinations
 									// of normal-drawing settings (off/off, on/off etc...
+	GLUtesselator* m_tesselator;
 };

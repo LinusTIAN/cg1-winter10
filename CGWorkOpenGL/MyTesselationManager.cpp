@@ -3,32 +3,37 @@
 
 MyTesselationManager::MyTesselationManager(void)
 {
+	m_tobj = NULL;
 }
 
 MyTesselationManager::~MyTesselationManager(void)
 {
 }
 
+void CALLBACK myDrawVertex3dv(GLdouble *vec)
+{
+	glVertex3dv(vec);
+}
 
 
-void beginCallback(GLenum which)
+void CALLBACK beginCallback(GLenum which)
 {
 	glBegin(which);
 }
 
-void endCallback(void)
+void CALLBACK endCallback(void)
 {
 	glEnd();
 }
 
-void errorCallback(GLenum errorCode)
+void CALLBACK errorCallback(GLenum errorCode)
 {
    const GLubyte *estring;
    estring = gluErrorString(errorCode);
    fprintf (stderr, "Tessellation Error: %s\n", estring);
    exit (0);
 }
-void combineCallback(GLdouble coords[3], 
+void CALLBACK combineCallback(GLdouble coords[3], 
                      GLdouble *vertex_data[4],
                      GLfloat weight[4], GLdouble **dataOut )
 {
@@ -47,19 +52,31 @@ void combineCallback(GLdouble coords[3],
    *dataOut = vertex;
 }
 
-void MyTesselationManager::Init(){
-	GLUtesselator* tobj = gluNewTess();
-	gluTessCallback(tobj, GLU_TESS_VERTEX, (void (__stdcall *) (void)) &glVertex3dv);
-	gluTessCallback(tobj, GLU_TESS_BEGIN, (void (__stdcall *) (void)) &beginCallback);
-	gluTessCallback(tobj, GLU_TESS_END, (void (__stdcall *) (void)) &endCallback);
-	gluTessCallback(tobj, GLU_TESS_ERROR, (void (__stdcall *) (void)) &errorCallback);   
-	gluTessCallback(tobj, GLU_TESS_COMBINE, (void (__stdcall *) (void)) & combineCallback);
- 
-   	GLdouble v1[3] = {252.0, 153.0, 0.0};
-	GLdouble v2[3] = {252.0, 47.0, 0.0};
-	GLdouble v3[3] = {393.0, 47.0, 0.0};
-	GLdouble v4[3] = {393.0, 153.0, 0.0};
+void* MyTesselationManager::setTesselation(bool isTess){
 
+	if (m_tobj != NULL)
+		gluDeleteTess((GLUtesselator*)m_tobj);
+
+	if (isTess){
+		m_tobj = gluNewTess();
+		gluTessCallback((GLUtesselator*)m_tobj, GLU_TESS_VERTEX, (void (__stdcall *) (void)) &myDrawVertex3dv);
+		gluTessCallback((GLUtesselator*)m_tobj, GLU_TESS_BEGIN, (void (__stdcall *) (void)) &beginCallback);
+		gluTessCallback((GLUtesselator*)m_tobj, GLU_TESS_END, (void (__stdcall *) (void)) &endCallback);
+		gluTessCallback((GLUtesselator*)m_tobj, GLU_TESS_ERROR, (void (__stdcall *) (void)) &errorCallback);   
+		gluTessCallback((GLUtesselator*)m_tobj, GLU_TESS_COMBINE, (void (__stdcall *) (void)) & combineCallback);
+	}
+	else{
+		m_tobj = NULL;
+	}
+	return m_tobj;
+ /*
+   	GLdouble v1[6] = {1.0, 0.0, 0.0,1,1,1};
+	GLdouble v2[6] = {1.0, 1.0, 0.0,1,1,1};
+	GLdouble v3[6] = {0.0, 1.0, 0.0,1,1,1};
+	GLdouble v4[6] = {0.0, 0.0, 0.0,1,1,1};
+
+	
+	glColor3d( 1.0,  1.0,  1.0);
 
    gluTessBeginPolygon(tobj, NULL);
       gluTessBeginContour(tobj);			
@@ -70,7 +87,5 @@ void MyTesselationManager::Init(){
 
 
       gluTessEndContour(tobj);
-   gluTessEndPolygon(tobj);
-
-
+   gluTessEndPolygon(tobj);*/
 }

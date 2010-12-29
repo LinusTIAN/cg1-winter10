@@ -16,11 +16,14 @@ public:
 	void setNormal(double norm_x, double norm_y, double norm_z);
 
 	void Draw();
+	void drawTesselated(GLUtesselator* tobj);
+
 
 public:
 	double x, y, z;
 	MyVector normal;
 
 	double m_u, m_v;
+private:
 	bool m_hasUV;
 };

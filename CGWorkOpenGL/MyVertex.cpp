@@ -40,16 +40,6 @@ void MyVertex::Draw() {
 	else{
 
 	}
-	/*else{
-		if (iterationNum==0)
-			glTexCoord2f(0.0, 0.0);
-		else if (iterationNum==1)
-			glTexCoord2f(1.0, 0.0);
-		else if (iterationNum==2)
-			glTexCoord2f(1.0, 1.0);
-		else if (iterationNum==3)
-			glTexCoord2f(0.0, 1.0);
-	}*/
 
 	//draw normal
 	GLfloat norm[3] = {(GLfloat) normal.m_x, (GLfloat) normal.m_y, (GLfloat) normal.m_z}; 
@@ -59,3 +49,9 @@ void MyVertex::Draw() {
 	//draw vertex
 	glVertex3d(x, y, z);
 }
+
+void MyVertex::drawTesselated(GLUtesselator* tobj){
+	GLdouble v[6] = {x, y, z, normal.m_x, normal.m_y, normal.m_z};
+	gluTessVertex(tobj, v, v);
+}
+
