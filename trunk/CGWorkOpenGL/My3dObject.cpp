@@ -4,7 +4,8 @@
 #include <string>
 
 
-My3dObject::My3dObject(int nPolygons)
+My3dObject::My3dObject(string name, int nPolygons)
+	: m_name(name)
 {
 	nextPoly = 0;
 	arrSize = nPolygons;
