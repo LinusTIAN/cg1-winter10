@@ -20,6 +20,7 @@
 #include "MyFogPrameters.h"
 #include "MyMaterialManager.h"
 #include "MyTextureManager.h"
+#include "MyTesselationManager.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // #defined Constants

@@ -294,6 +294,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MyTesselationManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MyTextureManager.cpp"
 				>
 			</File>
@@ -490,6 +494,10 @@
 			</File>
 			<File
 				RelativePath=".\MyPolygon.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MyTesselationManager.h"
 				>
 			</File>
 			<File
