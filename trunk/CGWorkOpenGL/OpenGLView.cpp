@@ -472,12 +472,8 @@ void COpenGLView::OnDraw(CDC* pDC)
 		glCullFace(GL_BACK);
 	}
 
-	
 	glClearColor((GLclampf)m_backgroundColor[0], (GLclampf)m_backgroundColor[1], (GLclampf)m_backgroundColor[2], 0.0f);
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// clear screen and zbuffer
-
-
 
 	if (objectData == NULL)
 	{
@@ -503,9 +499,6 @@ void COpenGLView::OnDraw(CDC* pDC)
 
 	glFlush();
 	SwapBuffers(wglGetCurrentDC());
-
-
-
 }
 
 
@@ -588,7 +581,7 @@ void COpenGLView::draw_axis()
 
 
 void COpenGLView::RenderScene() {
-	MyTesselationManager mng;
+	//MyTesselationManager mng;
 	//mng.Init();
 	//return;
 
@@ -596,9 +589,7 @@ void COpenGLView::RenderScene() {
 	{
 		if (m_recompile)
 		{
-			// re-compile display lists
-			objectData->GetDisplayList(true);
-			objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals, true);
+			objectData->recompileAll();
 			m_recompile = false;
 		}
 
@@ -638,9 +629,8 @@ void COpenGLView::OnFileLoad()
 		OnFileReset();
 		materialReset();
 
-		// pre-compile display list
-		objectData->GetDisplayList(true);
-		objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals, true);
+		// mark for re-compilation
+		m_recompile = true;
 	} 
 }
 
@@ -1290,9 +1280,7 @@ void COpenGLView::OnOptionsChangewirecolor()
 										GetGValue(color) / 255.0,
 										GetBValue(color) / 255.0	);
 
-			// recompile the display lists with the new color!
-			//objectData->GetDisplayList(true);
-			//objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals, true);
+			// mark for re-compilation
 			m_recompile = true;
 		
 			Invalidate();
@@ -1506,6 +1494,7 @@ void COpenGLView::OnMaterialLoadtexture()
 		for (int i=0; i<objectData->m_nextObj; i++){
 			objectData->m_objects[i]->enableTexture(false);
 		}
+
 		m_recompile = true;
 		Invalidate();
 	}

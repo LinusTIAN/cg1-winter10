@@ -25,6 +25,17 @@ MyCompositeObject::~MyCompositeObject(void)
 	delete [] m_objects;
 }
 
+void MyCompositeObject::recompileAll(void)
+{
+	// recompile object display list
+	for (int i = (int)SELECT_OPAQUE; i <= (int)SELECT_ALL; i++)
+		this->GetDisplayList((OBJECT_SELECTOR_T)i, true);
+
+	// recompile normals display list
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 2; j++)
+			this->GetNormalsDisplayList(i, j, true);
+}
 
 void MyCompositeObject::addObjectRef(My3dObject* obj)
 {
