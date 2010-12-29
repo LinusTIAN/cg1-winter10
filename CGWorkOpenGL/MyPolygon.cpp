@@ -125,6 +125,9 @@ void MyPolygon::DrawNormals(bool faceNormal, bool vertexNormals, double size)
 }
 
 void MyPolygon::drawTesselated(GLUtesselator* tobj){
+	GLdouble** pcArr = new GLdouble*[nextVertex];
+
+
 	gluTessBeginPolygon(tobj, NULL);
     gluTessBeginContour(tobj);
 	for (int i=0; i < nextVertex; i++)
@@ -141,19 +144,20 @@ void MyPolygon::drawTesselated(GLUtesselator* tobj){
 				shade = 0.1;	// maintain /some/ ambient light...
 				glColor3d(shade, shade, shade);
 		}
-		m_vertices[i].drawTesselated(tobj);
+		pcArr[i] = new GLdouble[6];
+		pcArr[i][0] = m_vertices[i].x;
+		pcArr[i][1] = m_vertices[i].y;
+		pcArr[i][2] = m_vertices[i].z;
+		gluTessVertex(tobj, pcArr[i], pcArr[i]);
 	}
-			/*GLdouble v1[6] = {-1.0, 2.0, 0.0,1,1,1};
-			gluTessVertex(tobj, v1, v1);
-			GLdouble v2[6] = {1.0, 2.0, 0.0,1,1,1};
-			gluTessVertex(tobj, v2, v2);
-			GLdouble v3[6] = {-1.0, -2.0, 0.0,1,1,1};
-			gluTessVertex(tobj, v3, v3);
-			GLdouble v4[6] = {1.0, -2.0, 0.0,1,1,1};
-			gluTessVertex(tobj, v4, v4);*/
 
+    gluTessEndContour(tobj);
+	gluTessEndPolygon(tobj);
+	
+	for (int i=0; i < nextVertex; i++)
+	{
+		delete [] pcArr[i];
+	}
 
-
-      gluTessEndContour(tobj);
-   gluTessEndPolygon(tobj);
+	delete [] pcArr;
 }

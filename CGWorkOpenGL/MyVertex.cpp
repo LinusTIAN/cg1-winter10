@@ -50,8 +50,4 @@ void MyVertex::Draw() {
 	glVertex3d(x, y, z);
 }
 
-void MyVertex::drawTesselated(GLUtesselator* tobj){
-	GLdouble v[6] = {x, y, z, normal.m_x, normal.m_y, normal.m_z};
-	gluTessVertex(tobj, v, v);
-}
 
