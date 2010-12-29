@@ -10,6 +10,9 @@
 using namespace std;
 
 
+string MyTextureManager::m_textureDir = ".";
+
+
 MyTextureManager::MyTextureManager(void)
 {
 	m_enabled = true;
@@ -60,7 +63,7 @@ void MyTextureManager::addPTexture(const char *str, bool fullPath){
 		//string val3 = s.substr(0,length);
 
 		fileName = fileName.substr(0,fileName.size()-3);
-		fileName ="pics\\"+fileName+ "png";
+		fileName = MyTextureManager::m_textureDir + "\\" + fileName+ "png";
 	}
 
 	PngWrapper wrapper;

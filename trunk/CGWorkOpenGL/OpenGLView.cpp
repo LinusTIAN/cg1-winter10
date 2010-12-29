@@ -626,6 +626,13 @@ void COpenGLView::OnFileLoad()
 		objectData = new MyCompositeObject();
 
 		m_strItdFileName = dlg.GetPathName();		// Full path and filename
+		int sep = m_strItdFileName.ReverseFind('\\');
+		if (sep >= 0) {
+			// last path-separator found
+			CString filePath = m_strItdFileName.Left(sep);
+			MyTextureManager::m_textureDir = filePath;
+		}
+
 		PngWrapper p;
 
 		CGSkelProcessIritDataFiles(m_strItdFileName, 1);	// Open the file and read it.
@@ -1492,7 +1499,6 @@ void COpenGLView::OnMaterialLoadtexture()
 		glMatrixMode(GL_TEXTURE);
 		glPopMatrix();
 		glPushMatrix();
-
 
 		m_textureManager.addPTexture(file.c_str(), true);
 		m_textureManager.set();
