@@ -588,6 +588,10 @@ void COpenGLView::draw_axis()
 
 
 void COpenGLView::RenderScene() {
+	MyTesselationManager mng;
+	//mng.Init();
+	//return;
+
 	if (objectData != NULL)
 	{
 		if (m_recompile)
