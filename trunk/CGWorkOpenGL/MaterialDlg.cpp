@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "OpenGL.h"
 #include "MaterialDlg.h"
+#include "globals.h"
 
 
 // CMaterialDlg dialog
@@ -33,10 +34,10 @@ CMaterialDlg::CMaterialDlg(MyMaterialManager& materialManager, CWnd* pParent /*=
 
 	
 	switch(materialManager.m_sType){
-	case  1:
+	case  GL_EYE_LINEAR:
 		m_sType = "Eye Linear";
 		break;
-	case 2:
+	case GL_OBJECT_LINEAR:
 		m_sType = "Object Linear";
 		break;
 	default:
@@ -46,10 +47,10 @@ CMaterialDlg::CMaterialDlg(MyMaterialManager& materialManager, CWnd* pParent /*=
 
 	
 	switch(materialManager.m_tType){
-	case  1:
+	case  GL_EYE_LINEAR:
 		m_tType = "Eye Linear";
 		break;
-	case 2:
+	case GL_OBJECT_LINEAR:
 		m_tType = "Object Linear";
 		break;
 	default:
@@ -101,19 +102,19 @@ MyMaterialManager& CMaterialDlg::getMaterialManager(){
 	m_materialManager.m_tAuto = m_tAuto;
 						
 	if (m_sType == "Eye Linear")
-		m_materialManager.m_sType = 1;
+		m_materialManager.m_sType = GL_EYE_LINEAR;
 	else if (m_sType == "Object Linear")
-		m_materialManager.m_sType = 2;
+		m_materialManager.m_sType = GL_OBJECT_LINEAR;
 	else
-		m_materialManager.m_sType = 3;
+		m_materialManager.m_sType = GL_SPHERE_MAP;
 
 
 	if (m_tType == "Eye Linear")
-		m_materialManager.m_tType = 1;
+		m_materialManager.m_tType = GL_EYE_LINEAR;
 	else if (m_tType == "Object Linear")
-		m_materialManager.m_tType = 2;
+		m_materialManager.m_tType = GL_OBJECT_LINEAR;
 	else
-		m_materialManager.m_tType = 3;
+		m_materialManager.m_tType = GL_SPHERE_MAP;
 
 	return m_materialManager;
 }

@@ -146,14 +146,18 @@ void MyTextureManager::set(){
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,   GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,   GL_NEAREST);
 
-			GLfloat xequalzero[] = {1.0, 0.0, 0.0, 0.0};
-				
-			GLfloat slanted[] = {1.0, 1.0, 1.0, 0.0};
-
+			
 			if (m_materialManager.m_sAuto){
 				glEnable(GL_TEXTURE_GEN_S);
-				glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-				glTexGenfv(GL_S, GL_OBJECT_PLANE, slanted);
+				glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, m_materialManager.m_sType);
+				GLfloat coord[] = {	m_materialManager.m_sCoord1, 
+									m_materialManager.m_sCoord2, 
+									m_materialManager.m_sCoord3, 
+									m_materialManager.m_sCoord4};
+				if (m_materialManager.m_sType == GL_EYE_LINEAR)
+					glTexGenfv(GL_S, GL_EYE_PLANE, coord);
+				else
+					glTexGenfv(GL_S, GL_OBJECT_PLANE, coord);
 			}
 			else{
 				glDisable(GL_TEXTURE_GEN_S);
@@ -161,8 +165,15 @@ void MyTextureManager::set(){
 
 			if (m_materialManager.m_tAuto){
 				glEnable(GL_TEXTURE_GEN_T);
-				glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
-				glTexGenfv(GL_T, GL_OBJECT_PLANE, slanted);
+				glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, m_materialManager.m_tType);
+				GLfloat coord[] = {	m_materialManager.m_tCoord1, 
+									m_materialManager.m_tCoord2, 
+									m_materialManager.m_tCoord3, 
+									m_materialManager.m_tCoord4};
+				if (m_materialManager.m_sType == GL_EYE_LINEAR)
+					glTexGenfv(GL_T, GL_EYE_PLANE, coord);
+				else
+					glTexGenfv(GL_T, GL_OBJECT_PLANE, coord);
 			}
 			else{
 				glDisable(GL_TEXTURE_GEN_T);
