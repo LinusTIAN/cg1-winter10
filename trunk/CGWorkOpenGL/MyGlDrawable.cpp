@@ -1,5 +1,4 @@
 #include "MyGlDrawable.h"
-#include "MyPostEffect.h"
 #include <windows.h>
 #include "gl\gl.h"    // Include the standard OpenGL  headers
 #include "gl\glu.h"   // Add the utility library

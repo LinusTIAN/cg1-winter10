@@ -114,8 +114,7 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper){
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_sWidth, 
 						m_sHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
 						m_sImage);
-
-	
+	//delete checkImage;
 }
 
 

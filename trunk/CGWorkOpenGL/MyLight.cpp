@@ -45,7 +45,7 @@ void MyLight::setupGeneralLight(bool show, LightParams& params ){
 	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
 
 	// maintain specular highlights in texture mode
-	glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR);
+	//glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL,GL_SEPARATE_SPECULAR_COLOR);
 
 	//glHint(GL_FRAGMENT_SHADER_DERIVATIVE_HINT, GL_NICEST);
 	//glHint(GL_PRESPECVITE_CORRECTION_HINT, GL_NICEST);
