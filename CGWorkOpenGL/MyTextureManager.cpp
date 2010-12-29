@@ -1,4 +1,5 @@
 #include "MyTextureManager.h"
+#include "stdafx.h"
 
 #include "globals.h"
 #include <new>
@@ -13,10 +14,16 @@ MyTextureManager::MyTextureManager(void)
 {
 	m_enabled = true;
 	m_showTexture = false;
+	m_checkImage = NULL;
+	m_isAuto = true;
 }
 
 MyTextureManager::~MyTextureManager(void)
 {
+	if (m_checkImage != NULL){
+		glDeleteTextures(1,&m_texture);
+		//delete m_checkImage;
+	}
 }
 
 int MyTextureManager::nearestPower( int value )
@@ -58,8 +65,10 @@ void MyTextureManager::addPTexture(const char *str, bool fullPath){
 
 	PngWrapper wrapper;
 	wrapper.SetFileName(fileName.c_str());
-	if (!wrapper.ReadPng())
+	if (!wrapper.ReadPng()){
+		AfxMessageBox("Texture file can not be read");
 		return ;
+	}
 
 	m_showTexture = true;
 	bindTexture(&wrapper);
@@ -72,17 +81,17 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper){
 	int imageWidth  = wrapper->GetWidth();
 	int imageHeight = wrapper->GetHeight();
 
-	GLubyte* checkImage = new GLubyte[imageWidth*imageHeight*4*sizeof(GLubyte)];
+	m_checkImage = new GLubyte[imageWidth*imageHeight*4*sizeof(GLubyte)];
 
 	int color;
 	for (int i = 0; i < imageHeight; i++) {
 		for (int j = 0; j < imageWidth; j++) {
 			color = wrapper->GetValue(j,i);
 			if(i*imageWidth*4 + j*4 +3 < imageWidth*imageHeight*4){
-				checkImage[i*imageWidth*4 + j*4 +0] = (GLubyte)  GET_R(color);
-				checkImage[i*imageWidth*4 + j*4 +1] = (GLubyte)  GET_G(color);
-				checkImage[i*imageWidth*4 + j*4 +2] = (GLubyte)  GET_B(color);
-				checkImage[i*imageWidth*4 + j*4 +3] = (GLubyte) 255;
+				m_checkImage[i*imageWidth*4 + j*4 +0] = (GLubyte)  GET_R(color);
+				m_checkImage[i*imageWidth*4 + j*4 +1] = (GLubyte)  GET_G(color);
+				m_checkImage[i*imageWidth*4 + j*4 +2] = (GLubyte)  GET_B(color);
+				m_checkImage[i*imageWidth*4 + j*4 +3] = (GLubyte) 255;
 			}
 			else
 				assert (0);
@@ -96,13 +105,13 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper){
 
     //scale texture image to 2^m by 2^n if necessary 
     if ( m_sWidth == imageWidth && m_sHeight == imageHeight ) {
-         m_sImage = (GLubyte *) checkImage;
+         m_sImage = (GLubyte *) m_checkImage;
     } else {
          m_sImage = (GLubyte *)malloc( m_sHeight*m_sWidth*4*sizeof( GLubyte ) );
          gluScaleImage( GL_RGBA, imageWidth, imageHeight, 
-                        GL_UNSIGNED_BYTE, checkImage,
+                        GL_UNSIGNED_BYTE, m_checkImage,
                         m_sWidth, m_sHeight, GL_UNSIGNED_BYTE, m_sImage );
-		 delete checkImage;
+		 delete m_checkImage;
     }
 	
 	// Define texture
@@ -114,7 +123,7 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper){
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_sWidth, 
 						m_sHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
 						m_sImage);
-	//delete checkImage;
+	//delete m_checkImage;
 }
 
 
@@ -127,7 +136,7 @@ void MyTextureManager::set(){
 		if (m_showTexture){
 			glEnable(GL_TEXTURE_2D);
 			glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);//GL_DECAL);
-			glBindTexture(GL_TEXTURE_2D,m_texture);
+			glBindTexture(GL_TEXTURE_2D, m_texture);
 					
 			GLuint sWrapMode = m_materialManager.m_sRepeat? GL_REPEAT :GL_CLAMP;
 			GLuint tWrapMode = m_materialManager.m_tRepeat? GL_REPEAT :GL_CLAMP;
@@ -136,6 +145,33 @@ void MyTextureManager::set(){
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrapMode);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,   GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,   GL_NEAREST);
+
+			GLfloat xequalzero[] = {1.0, 0.0, 0.0, 0.0};
+				
+			GLfloat slanted[] = {1.0, 1.0, 1.0, 0.0};
+
+			if (m_materialManager.m_sAuto){
+				glEnable(GL_TEXTURE_GEN_S);
+				glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+				glTexGenfv(GL_S, GL_OBJECT_PLANE, slanted);
+			}
+			else{
+				glDisable(GL_TEXTURE_GEN_S);
+			}
+
+			if (m_materialManager.m_tAuto){
+				glEnable(GL_TEXTURE_GEN_T);
+				glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_OBJECT_LINEAR);
+				glTexGenfv(GL_T, GL_OBJECT_PLANE, slanted);
+			}
+			else{
+				glDisable(GL_TEXTURE_GEN_T);
+			}
+
+			
+
+		  // glEnable(GL_AUTO_NORMAL);
+
 		}
 		else{
 			glDisable(GL_TEXTURE_2D);

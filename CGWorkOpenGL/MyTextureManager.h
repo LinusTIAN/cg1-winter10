@@ -23,6 +23,8 @@ private:
 	unsigned char* m_sImage;
 	bool m_showTexture;
 	bool m_enabled;
+	bool m_isAuto;
+	unsigned char* m_checkImage;
 	MyMaterialManager m_materialManager;
 	
 	

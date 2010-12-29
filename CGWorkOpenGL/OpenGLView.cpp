@@ -1287,8 +1287,9 @@ void COpenGLView::OnOptionsChangewirecolor()
 										GetBValue(color) / 255.0	);
 
 			// recompile the display lists with the new color!
-			objectData->GetDisplayList(true);
-			objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals, true);
+			//objectData->GetDisplayList(true);
+			//objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals, true);
+			m_recompile = true;
 		
 			Invalidate();
 		}
@@ -1489,6 +1490,11 @@ void COpenGLView::OnMaterialLoadtexture()
 
 	if (dlg.DoModal () == IDOK) {
 		std::string file(dlg.GetPathName());
+
+		glMatrixMode(GL_TEXTURE);
+		glPopMatrix();
+		glPushMatrix();
+
 
 		m_textureManager.addPTexture(file.c_str(), true);
 		m_textureManager.set();

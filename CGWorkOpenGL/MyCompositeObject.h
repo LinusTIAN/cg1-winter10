@@ -29,7 +29,13 @@ public:
 		definition of OBJECT_SELECTOR_T for possible values. The default behavior if no value is
 		specified is to draw all sub-objects.
 	**/
-	int GetDisplayList(bool recompile = false) { return this->GetDisplayList(SELECT_ALL, recompile); }
+	int GetDisplayList(bool recompile = false) { 
+		if (recompile){//TODO slava: This is my fix.... 
+			this->GetDisplayList(SELECT_OPAQUE, recompile);
+			this->GetDisplayList(SELECT_TRANSPARENT, recompile);
+		}
+		return this->GetDisplayList(SELECT_ALL, recompile); 
+	}
 	int GetDisplayList(OBJECT_SELECTOR_T to_draw, bool recompile = false);
 
 	void changeColor(double r, double g, double b);
