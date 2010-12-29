@@ -255,6 +255,8 @@ BOOL COpenGLView::InitializeOpenGL()
 
 	// The code expects only the 2nd frame in the projection matrix to be used and the
 	// first one to always be the identity matrix, so make sure this is the case
+	glMatrixMode(GL_TEXTURE);
+	glPushMatrix();
 	glMatrixMode(GL_PROJECTION);
 	glPushMatrix();
 	glMatrixMode(GL_MODELVIEW);
@@ -1008,7 +1010,7 @@ void COpenGLView::TranslateModel(double x_amt, double y_amt)
 			y_translate = (m_nAxis == ID_AXIS_XY) ? y_amt * factor : y_translate;
 
 
-	if (m_nSpace == ID_ACTION_OBJECTSPACE)
+	if (m_nSpace == ID_ACTION_OBJECTSPACE || m_nSpace == ID_ACTION_TEXTURETRANSFORMATIONS)
 		glTranslated(x_translate, y_translate, z_translate);
 	else
 	{
@@ -1049,7 +1051,7 @@ void COpenGLView::RotateModel(double x_amt, double y_amt)
 		break;
 	}
 
-	if (m_nSpace == ID_ACTION_OBJECTSPACE)
+	if (m_nSpace == ID_ACTION_OBJECTSPACE || m_nSpace == ID_ACTION_TEXTURETRANSFORMATIONS)
 		glRotated(rotate_amt, rotate_axis_x, rotate_axis_y, rotate_axis_z);
 	else
 	{
@@ -1112,7 +1114,7 @@ void COpenGLView::ScaleModel(double x_amt, double y_amt)
 	const double factor = 1.0;
 	double scale_amt = (1 - x_amt - y_amt) * factor;
 
-	if (m_nSpace == ID_ACTION_OBJECTSPACE)
+	if (m_nSpace == ID_ACTION_OBJECTSPACE || m_nSpace == ID_ACTION_TEXTURETRANSFORMATIONS)
 		scaleAccordingToAxis(scale_amt);
 	else
 	{
@@ -1358,8 +1360,7 @@ void COpenGLView::OnOptionsPerspectivecontrol()
 
 void COpenGLView::ApplyLatestTransform(void)
 {
-	GLdouble m[16];
-
+	GLdouble m[16];	
 	glGetDoublev(GL_MODELVIEW_MATRIX, &m[0]);
 	glPopMatrix();
 	glLoadMatrixd(&m[0]);
@@ -1404,6 +1405,11 @@ void COpenGLView::OnFileReset()
 {
 	if (objectData != NULL){
 		m_backgroundColor[0] = m_backgroundColor[1] = m_backgroundColor[2] = 0;
+		
+		glMatrixMode(GL_TEXTURE);
+		glPopMatrix();
+		glPushMatrix();
+
 		// reset the ModelView matrix
 		glMatrixMode(GL_MODELVIEW);
 		glPopMatrix();

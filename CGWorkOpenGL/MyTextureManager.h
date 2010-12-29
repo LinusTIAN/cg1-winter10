@@ -24,7 +24,6 @@ private:
 	bool m_showTexture;
 	bool m_enabled;
 	MyMaterialManager m_materialManager;
-	//PngWrapper m_wrapper;
 	
 	
 // Find the largest power of two that is
