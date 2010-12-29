@@ -598,6 +598,12 @@ void COpenGLView::RenderScene() {
 		glCallList( objectData->GetDisplayList(MyCompositeObject::SELECT_TRANSPARENT) );
 		glDepthMask(GL_TRUE);	// restore write permissions for z-buffer
 
+		if (m_showVertexNormals || m_showFaceNormals) {
+			glDisable(GL_LIGHTING);
+			glColor3f(0, 1, 0);
+			glCallList( objectData->GetNormalsDisplayList(m_showFaceNormals, m_showVertexNormals) );
+		}
+
 		if (m_showBoundingBox){
 			glDisable(GL_LIGHTING);
 			glColor3f(1, 0, 0);
