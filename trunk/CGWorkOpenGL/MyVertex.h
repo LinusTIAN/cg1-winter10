@@ -16,7 +16,6 @@ public:
 	void setNormal(double norm_x, double norm_y, double norm_z);
 
 	void Draw();
-	void drawTesselated(GLUtesselator* tobj);
 
 
 public:
