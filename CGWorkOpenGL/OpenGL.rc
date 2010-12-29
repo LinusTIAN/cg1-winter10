@@ -149,8 +149,6 @@ BEGIN
     BEGIN
         MENUITEM "&Load Texture...",            ID_MATERIAL_LOADTEXTURE
         MENUITEM "&Properties...",              ID_MATERIAL_PROPERTIES
-        MENUITEM SEPARATOR
-        MENUITEM "Tesselation",                 ID_MATERIAL_TESSELATION
     END
     POPUP "&Help"
     BEGIN

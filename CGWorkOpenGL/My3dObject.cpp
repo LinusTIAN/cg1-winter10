@@ -1,5 +1,4 @@
 #include "My3dObject.h"
-#include "MyTesselationManager.h"
 #include <new>
 #include <cstring>
 #include <string>
@@ -8,7 +7,6 @@
 My3dObject::My3dObject(string name, int nPolygons)
 	: m_name(name)
 {
-	m_tesselator = NULL;
 	nextPoly = 0;
 	arrSize = nPolygons;
 
@@ -42,12 +40,8 @@ void My3dObject::Draw(void)
 
 	glColor4d(m_color[0], m_color[1], m_color[2], m_alpha);
 
-	for (int i=0; i<nextPoly; i++)
-	{
-		if (m_tesselator == NULL)
-			m_polygons[i]->Draw();
-		else
-			m_polygons[i]->drawTesselated(m_tesselator);
+	for (int i=0; i<nextPoly; i++){
+		m_polygons[i]->Draw();
 	}
 }
 
@@ -109,8 +103,3 @@ void My3dObject::addPTexture(const char *str, bool fullPath){
 void My3dObject::enableTexture(bool enable){
 	m_textureManager.enable( enable );
 }
-
-void My3dObject::setTesselator(GLUtesselator* tesselator){
-	m_tesselator = tesselator;
-}
-

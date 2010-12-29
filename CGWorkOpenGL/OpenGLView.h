@@ -58,7 +58,6 @@ private:
 	bool m_showVertexNormals;
 	bool m_showFaceNormals;
 	bool m_recompile;
-	bool m_showTesselation;
 	double m_backgroundColor[3];
 	double m_dVal;
 	MyFogPrameters m_fogFarams;
@@ -103,7 +102,6 @@ protected:
 			m_zFar;		// hold the clipping planes
 	MyLight m_lightManager;
 	bool m_showBackFaces;
-	MyTesselationManager m_tesselationManager;
 
 private:
 	void draw_axis();
@@ -111,7 +109,6 @@ private:
 	void lightReset();
 	void materialReset();
 	void setupLightInScene();
-	void setTesselation(bool bTesselation);
 
 
 // Generated message map functions
@@ -199,8 +196,6 @@ public:
 	afx_msg void OnUpdateActionTexturetransformations(CCmdUI *pCmdUI);
 	afx_msg void OnResetLight();
 	afx_msg void OnResetView();
-	afx_msg void OnMaterialTesselation();
-	afx_msg void OnUpdateMaterialTesselation(CCmdUI *pCmdUI);
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp

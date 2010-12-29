@@ -4,7 +4,8 @@
 #include "PngWrapper.h"
 #include "MyMaterialManager.h"
 
-//
+using std::string;
+
 class MyTextureManager
 {
 public:
@@ -13,6 +14,7 @@ public:
 
 	void addPTexture(const char *str, bool fullPath);
 	void setupTextureParams(MyMaterialManager& materialManager);
+	void bindTexture(PngWrapper* wrapper);
 	void set();
 	void enable(bool enable);
 
@@ -20,11 +22,8 @@ public:
 		to the current working directory. Assign a different path to this field if you
 		want to change the search path.
 	**/
-	static std::string m_textureDir;
+	static string m_textureDir;
 
-private:
-	void bindTexture(PngWrapper* wrapper);
-	
 private:
 	int m_sWidth, m_sHeight;
 	unsigned int m_texture;
@@ -34,7 +33,8 @@ private:
 	bool m_isAuto;
 	unsigned char* m_checkImage;
 	MyMaterialManager m_materialManager;
-	
+	string m_picFile;
+	bool m_enableMipMap;
 	
 // Find the largest power of two that is
 // less than or equal to the value

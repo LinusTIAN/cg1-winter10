@@ -18,6 +18,7 @@ using std::endl;
 #include "PerspectiveOptionsDialog.h"
 #include "MaterialDlg.h"
 #include "FogDialog.h"
+#include "MyEnvironMapper.h"
 
 #include "globals.h"
 
@@ -112,8 +113,6 @@ BEGIN_MESSAGE_MAP(COpenGLView, CView)
 	ON_UPDATE_COMMAND_UI(ID_ACTION_TEXTURETRANSFORMATIONS, &COpenGLView::OnUpdateActionTexturetransformations)
 	ON_COMMAND(ID_RESET_LIGHT, &COpenGLView::OnResetLight)
 	ON_COMMAND(ID_RESET_VIEW, &COpenGLView::OnResetView)
-	ON_COMMAND(ID_MATERIAL_TESSELATION, &COpenGLView::OnMaterialTesselation)
-	ON_UPDATE_COMMAND_UI(ID_MATERIAL_TESSELATION, &COpenGLView::OnUpdateMaterialTesselation)
 END_MESSAGE_MAP()
 
 
@@ -133,7 +132,6 @@ COpenGLView::COpenGLView()
 , m_lastCtrlPoint(0)
 , m_mouseScreenZ(0)
 {
-	m_showTesselation = false;
 	m_mouseSensitivity = 50;
 	m_showBoundingBox = false; 
 	m_showVertexNormals = false;
@@ -584,9 +582,22 @@ void COpenGLView::draw_axis()
 
 
 void COpenGLView::RenderScene() {
-	
+	//MyTesselationManager mng;
+	//mng.Init();
+	//return;
+
 	if (objectData != NULL)
 	{
+		glPushMatrix();
+			MyEnvironMapper env(*objectData);
+			env.setActiveObject( *(objectData->m_objects[0]) );
+			env.setupPOV();
+			objectData->Draw();
+			env.applyReflection(m_WindowWidth, m_WindowHeight);
+		glPopMatrix();
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// clear screen and zbuffer
+
 		if (m_recompile)
 		{
 			objectData->recompileAll();
@@ -644,7 +655,6 @@ void COpenGLView::OnFileLoad()
 
 		// mark for re-compilation
 		m_recompile = true;
-		setTesselation(false);
 	} 
 }
 
@@ -874,18 +884,6 @@ void COpenGLView::OnUpdateOptionsBackfacesculling(CCmdUI *pCmdUI)
 	pCmdUI->SetCheck( !m_showBackFaces);
 }
 
-void COpenGLView::OnMaterialTesselation()
-{
-	m_showTesselation = !m_showTesselation;
-	setTesselation(m_showTesselation);
-	m_recompile = true;
-	Invalidate();
-}
-
-void COpenGLView::OnUpdateMaterialTesselation(CCmdUI *pCmdUI)
-{
-	pCmdUI->SetCheck(m_showTesselation);
-}
 // LIGHT SETUP HANDLER ///////////////////////////////////////////
 
 void COpenGLView::OnLightConstants() 
@@ -1569,15 +1567,3 @@ void COpenGLView::materialReset(){
 	m_materialManager.reset();
 	m_textureManager.setupTextureParams(m_materialManager);
 }
-
-
-void COpenGLView::setTesselation(bool bTesselation){
-	m_showTesselation = bTesselation;
-		GLUtesselator* tobj = (GLUtesselator*)m_tesselationManager.setTesselation(bTesselation);
-	if (objectData != NULL){
-		for (int i = 0; i <  objectData->m_nextObj; i++) {
-			objectData->m_objects[i]->setTesselator(tobj);
-		}
-	}
-}
-

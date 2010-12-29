@@ -50,7 +50,4 @@ protected:
 									// of normal-drawing settings (off/off, on/off etc...
 	int m_compDisplayLists[3];		// holds a display list for each of the 3 possible combinations
 									// of drawing settings (transparent, opaque, both)
-
-
-	int temp;
 };

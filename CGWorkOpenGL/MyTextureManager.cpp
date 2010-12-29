@@ -19,13 +19,15 @@ MyTextureManager::MyTextureManager(void)
 	m_showTexture = false;
 	m_checkImage = NULL;
 	m_isAuto = true;
+	m_picFile = "";
+	m_enableMipMap = false;
 }
 
 MyTextureManager::~MyTextureManager(void)
 {
 	if (m_checkImage != NULL){
 		glDeleteTextures(1,&m_texture);
-		//delete m_checkImage;
+		delete [] m_sImage;
 	}
 }
 
@@ -46,6 +48,7 @@ void MyTextureManager::addPTexture(const char *str, bool fullPath){
 	
 	string s(str);
 	string fileName(str);
+
 	if (! fullPath){
 		int length = s.find_first_of(',');
 		fileName = s.substr(0,length);
@@ -66,6 +69,8 @@ void MyTextureManager::addPTexture(const char *str, bool fullPath){
 		fileName = MyTextureManager::m_textureDir + "\\" + fileName+ "png";
 	}
 
+	m_picFile = fileName;
+
 	PngWrapper wrapper;
 	wrapper.SetFileName(fileName.c_str());
 	if (!wrapper.ReadPng()){
@@ -84,7 +89,7 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper){
 	int imageWidth  = wrapper->GetWidth();
 	int imageHeight = wrapper->GetHeight();
 
-	m_checkImage = new GLubyte[imageWidth*imageHeight*4*sizeof(GLubyte)];
+	m_checkImage = new GLubyte[imageWidth*imageHeight*4];
 
 	int color;
 	for (int i = 0; i < imageHeight; i++) {
@@ -110,11 +115,11 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper){
     if ( m_sWidth == imageWidth && m_sHeight == imageHeight ) {
          m_sImage = (GLubyte *) m_checkImage;
     } else {
-         m_sImage = (GLubyte *)malloc( m_sHeight*m_sWidth*4*sizeof( GLubyte ) );
+         m_sImage = new GLubyte[m_sHeight*m_sWidth*4];
          gluScaleImage( GL_RGBA, imageWidth, imageHeight, 
                         GL_UNSIGNED_BYTE, m_checkImage,
                         m_sWidth, m_sHeight, GL_UNSIGNED_BYTE, m_sImage );
-		 delete m_checkImage;
+		 delete [] m_checkImage;
     }
 	
 	// Define texture
@@ -123,10 +128,11 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper){
 	glGenTextures(1,  &m_texture);
 	glBindTexture(GL_TEXTURE_2D, m_texture);
 
+	int i = glGetError();
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_sWidth, 
 						m_sHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
 						m_sImage);
-	//delete m_checkImage;
+	i = glGetError();
 }
 
 
@@ -146,10 +152,9 @@ void MyTextureManager::set(){
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWrapMode);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrapMode);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,   GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,   GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_enableMipMap ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 
-			
 			if (m_materialManager.m_sAuto){
 				glEnable(GL_TEXTURE_GEN_S);
 				glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, m_materialManager.m_sType);

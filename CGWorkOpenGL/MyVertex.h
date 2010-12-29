@@ -17,12 +17,10 @@ public:
 
 	void Draw();
 
-
 public:
 	double x, y, z;
 	MyVector normal;
 
 	double m_u, m_v;
-private:
 	bool m_hasUV;
 };

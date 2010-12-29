@@ -31,10 +31,10 @@ public:
     void SetFileName(const char * name);
     void SetWidth(int width);
     void SetHeight(int height);
-    int GetWidth();
-    int GetHeight();
+    virtual int GetWidth();
+    virtual int GetHeight();
     void SetValue(unsigned int x,unsigned int y,unsigned int value);
-    int GetValue(unsigned int x,unsigned int y);
+    virtual int GetValue(unsigned int x,unsigned int y);
     int GetNumChannels();
     int GetBPP();
     bool ReadPng();
