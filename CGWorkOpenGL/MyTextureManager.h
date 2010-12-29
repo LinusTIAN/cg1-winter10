@@ -1,7 +1,9 @@
 #pragma once
 
+#include <string>
 #include "PngWrapper.h"
 #include "MyMaterialManager.h"
+
 //
 class MyTextureManager
 {
@@ -13,6 +15,12 @@ public:
 	void setupTextureParams(MyMaterialManager& materialManager);
 	void set();
 	void enable(bool enable);
+
+	/** m_textureDir points to the directory to search for texture files in. This defaults
+		to the current working directory. Assign a different path to this field if you
+		want to change the search path.
+	**/
+	static std::string m_textureDir;
 
 private:
 	void bindTexture(PngWrapper* wrapper);
