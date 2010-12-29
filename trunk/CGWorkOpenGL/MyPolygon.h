@@ -19,6 +19,9 @@ public:
 	// you can specify normal length to draw implicitly or let it be calculated relative to
 	// the size of the face
 	void DrawNormals(bool faceNormal, bool vertexNormals, double size = 0);
+	
+	void drawTesselated(GLUtesselator* tobj);
+
 
 private:
 	int nextVertex;	// points to first unused index in vertex array

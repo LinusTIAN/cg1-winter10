@@ -6,5 +6,8 @@ public:
 	MyTesselationManager(void);
 	~MyTesselationManager(void);
 
-	void Init();
+	void* setTesselation(bool isTess);
+
+	
+	void* m_tobj;
 };

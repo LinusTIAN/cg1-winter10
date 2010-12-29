@@ -123,3 +123,37 @@ void MyPolygon::DrawNormals(bool faceNormal, bool vertexNormals, double size)
 		}
 	}
 }
+
+void MyPolygon::drawTesselated(GLUtesselator* tobj){
+	gluTessBeginPolygon(tobj, NULL);
+    gluTessBeginContour(tobj);
+	for (int i=0; i < nextVertex; i++)
+	{
+		if (torchEnabled)
+		{
+			// find the distance of the point from mouse cursor and set the color accordingly
+			double	dx = m_vertices[i].x - cursor_x,
+					dy = m_vertices[i].y - cursor_y,
+					dz = m_vertices[i].z - cursor_z,
+					d = sqrt(dx*dx + dy*dy + dz*dz),
+					shade = 1 - (d/torch_range);
+				if (shade < 0.1)//was 0.035
+				shade = 0.1;	// maintain /some/ ambient light...
+				glColor3d(shade, shade, shade);
+		}
+		m_vertices[i].drawTesselated(tobj);
+	}
+			/*GLdouble v1[6] = {-1.0, 2.0, 0.0,1,1,1};
+			gluTessVertex(tobj, v1, v1);
+			GLdouble v2[6] = {1.0, 2.0, 0.0,1,1,1};
+			gluTessVertex(tobj, v2, v2);
+			GLdouble v3[6] = {-1.0, -2.0, 0.0,1,1,1};
+			gluTessVertex(tobj, v3, v3);
+			GLdouble v4[6] = {1.0, -2.0, 0.0,1,1,1};
+			gluTessVertex(tobj, v4, v4);*/
+
+
+
+      gluTessEndContour(tobj);
+   gluTessEndPolygon(tobj);
+}

@@ -1,7 +1,9 @@
 #include "MyCompositeObject.h"
+#include "MyTesselationManager.h"
 
 MyCompositeObject::MyCompositeObject(void)
 {
+	temp = 0;
 	m_arrSize = 20;
 	m_objects = new My3dObject*[m_arrSize];
 	m_nextObj = 0;
