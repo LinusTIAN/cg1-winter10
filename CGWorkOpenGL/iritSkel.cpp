@@ -125,7 +125,7 @@ bool CGSkelStoreData(IPObjectStruct *PObj)
 
 	/* You can use IP_IS_POLYGON_OBJ(PObj) and IP_IS_POINTLIST_OBJ(PObj) 
 	   to identify the type of the object*/
-	My3dObject* newObj = new My3dObject();
+	My3dObject* newObj = new My3dObject( (PObj->ObjName) ? PObj->ObjName : "DEFAULT" );
 
 	if (CGSkelGetObjectColor(PObj, RGB))
 	{
