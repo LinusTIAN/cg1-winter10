@@ -1,4 +1,5 @@
 #include "MyTesselationManager.h"
+#include "MyVertex.h"
 #include "globals.h"
 
 MyTesselationManager::MyTesselationManager(void)
@@ -12,7 +13,21 @@ MyTesselationManager::~MyTesselationManager(void)
 
 void CALLBACK myDrawVertex3dv(GLdouble *vec)
 {
+	// draw texture
+	if (vec[3]){
+		glTexCoord2f((GLfloat) vec[4], (GLfloat) vec[5]);
+	}
+	else{
+
+	}
+
+	//draw normal
+	GLfloat norm[3] = {(GLfloat) vec[6], (GLfloat) vec[7], (GLfloat) vec[8]}; 
+	//assert(! (norm[0]==0 && norm[1]==0 && norm[2]==0)); //TODO check which model hasn't any normals
+	glNormal3fv(norm);
+
 	glVertex3dv(vec);
+
 }
 
 

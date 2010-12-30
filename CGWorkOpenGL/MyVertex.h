@@ -23,6 +23,5 @@ public:
 	MyVector normal;
 
 	double m_u, m_v;
-private:
 	bool m_hasUV;
 };
