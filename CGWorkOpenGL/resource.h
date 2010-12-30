@@ -10,6 +10,7 @@
 #define IDD_MOUSE_SENSIVIITY            140
 #define IDD_PERSPECTIVE_DLG             141
 #define IDD_FogDialog                   142
+#define IDD_TEXTUREDIALOG               145
 #define IDC_LIGHT_SPACE                 1010
 #define IDC_RADIO_LIGHT1                1017
 #define IDC_RADIO_LIGHT2                1018
@@ -55,6 +56,9 @@
 #define IDC_EDIT7                       1059
 #define IDC_EDIT8                       1060
 #define IDC_EDIT9                       1061
+#define IDC_OBJSELECT                   1062
+#define IDC_FILENAME                    1063
+#define IDC_BROWSE                      1064
 #define ID_FILE_LOAD                    32771
 #define ID_VIEW_ORTHOGRAPHIC            32772
 #define ID_VIEW_PERSPECTIVE             32773
@@ -99,14 +103,15 @@
 #define ID_RESET_LIGHT                  32841
 #define ID_RESET_VIEW                   32842
 #define ID_MATERIAL_TESSELATION         32843
+#define ID_MATERIAL_LOADMIPMAP          32844
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        145
-#define _APS_NEXT_COMMAND_VALUE         32844
-#define _APS_NEXT_CONTROL_VALUE         1062
+#define _APS_NEXT_RESOURCE_VALUE        146
+#define _APS_NEXT_COMMAND_VALUE         32845
+#define _APS_NEXT_CONTROL_VALUE         1065
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

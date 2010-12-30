@@ -103,7 +103,7 @@ int My3dObject::GetNormalsDisplayList(bool faceNormals, bool vertexNormals, doub
 }
 
 void My3dObject::addPTexture(const char *str, bool fullPath){
-	m_textureManager.addPTexture(str, fullPath, true);
+	m_textureManager.addPTexture(str, fullPath, false);
 }
 
 void My3dObject::enableTexture(bool enable){

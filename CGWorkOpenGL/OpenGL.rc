@@ -149,8 +149,9 @@ BEGIN
     BEGIN
         MENUITEM "&Load Texture...",            ID_MATERIAL_LOADTEXTURE
         MENUITEM "&Properties...",              ID_MATERIAL_PROPERTIES
+        MENUITEM "Load mipmap",                 ID_MATERIAL_LOADMIPMAP
         MENUITEM SEPARATOR
-        MENUITEM "Tesselation",                 ID_MATERIAL_TESSELATION
+        MENUITEM "Tessellation",                ID_MATERIAL_TESSELATION
     END
     POPUP "&Help"
     BEGIN
@@ -334,6 +335,20 @@ BEGIN
     CONTROL         "Enabled",IDC_CHECK1,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,23,79,13
 END
 
+IDD_TEXTUREDIALOG DIALOGEX 0, 0, 244, 94
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select Texture"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,128,69,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,184,69,50,14
+    COMBOBOX        IDC_OBJSELECT,54,12,120,95,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Object:",IDC_STATIC,18,12,26,12
+    LTEXT           "File:",IDC_STATIC,28,36,16,12
+    EDITTEXT        IDC_FILENAME,54,36,120,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse",IDC_BROWSE,186,36,48,12
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -465,6 +480,14 @@ BEGIN
         RIGHTMARGIN, 213
         TOPMARGIN, 7
         BOTTOMMARGIN, 137
+    END
+
+    IDD_TEXTUREDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 234
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 83
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -633,6 +656,8 @@ BEGIN
     ID_ACTION_TEXTURETRANSFORMATIONS "Transform Texture\nTransform Texture"
     ID_RESET_LIGHT          "Reset Lights\nReset Lights"
     ID_RESET_VIEW           "Reset View\nReset View"
+    ID_MATERIAL_TESSELATION "Toggle Tessellation\nToggle Tessellation"
+    ID_MATERIAL_LOADMIPMAP  "Load Texture for Mipmapping\nLoad Texture for Mipmapping"
 END
 
 #endif    // English (U.S.) resources
