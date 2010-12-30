@@ -8,7 +8,6 @@
 #define IDD_LIGHTS_DLG                  134
 #define IDD_MATERIAL_DLG                136
 #define IDD_MOUSE_SENSIVIITY            140
-#define IDD_PERSPECTIVE_DLG             141
 #define IDD_FogDialog                   142
 #define IDD_TEXTUREDIALOG               145
 #define IDC_LIGHT_SPACE                 1010

@@ -15,7 +15,6 @@ using std::endl;
 #include "LightDialog.h"
 
 #include "MouseSensitivityDialog.h"
-#include "PerspectiveOptionsDialog.h"
 #include "MaterialDlg.h"
 #include "FogDialog.h"
 #include "LoadTextureDlg.h"
@@ -962,25 +961,11 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (nFlags & MK_LBUTTON)
 	{
-		double	x_move_amt = (point.x - m_LastTransformPoint.x) / (double)m_WindowWidth,
-				y_move_amt = (m_LastTransformPoint.y - point.y ) / (double)m_WindowHeight;
+		int	x_move_amt = (point.x - m_LastTransformPoint.x),
+			y_move_amt = (m_LastTransformPoint.y - point.y );
 
-		double objSize;
-
-		if (objectData != NULL)
-		{
-			objSize = max(objectData->bbox.xSize(), objectData->bbox.ySize());
-			objSize = max(objSize, objectData->bbox.zSize());
-		} else 
-		{
-			objSize = 2;
-		}
-
-		x_move_amt *= objSize;
-		y_move_amt *= objSize;
-
-		x_move_amt *= m_mouseSensitivity / 100.0;
-		y_move_amt *= m_mouseSensitivity / 100.0;
+		//x_move_amt *= m_mouseSensitivity / 100.0;
+		//y_move_amt *= m_mouseSensitivity / 100.0;
 
 		// undo the previously applied transformation - we'll reapply it now along with the
 		// transform caused by this latest mouse move
@@ -1000,8 +985,6 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 			TranslateModel(x_move_amt, y_move_amt);
 			break;
 		case ID_ACTION_SCALE:
-			ScaleModel(x_move_amt, y_move_amt);
-			break;
 		case ID_ACTION_UNIFORMSCALING:
 			ScaleModel(x_move_amt, y_move_amt);
 			break;
@@ -1009,7 +992,6 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 			AfxMessageBox("Action not implemented.");
 			break;
 		}
-
 
 		glMatrixMode(GL_MODELVIEW);
 		mustRedraw = true;
@@ -1019,18 +1001,14 @@ void COpenGLView::OnMouseMove(UINT nFlags, CPoint point)
 		Invalidate();
 }
 
-void COpenGLView::TranslateModel(double x_amt, double y_amt)
+void COpenGLView::TranslateModel(int x_amt, int y_amt)
 {
-	const double factor = 1.0;
-	double translate_amt = (x_amt + y_amt) * factor;
-
-	double	x_translate = (m_nAxis == ID_AXIS_X)  ? translate_amt  : 0,
-			y_translate = (m_nAxis == ID_AXIS_Y)  ? translate_amt  : 0,
-			z_translate = (m_nAxis == ID_AXIS_Z)  ? translate_amt  : 0;
-
-			x_translate = (m_nAxis == ID_AXIS_XY) ? x_amt * factor : x_translate;
-			y_translate = (m_nAxis == ID_AXIS_XY) ? y_amt * factor : y_translate;
-
+	double factor = 1.0 * (m_mouseSensitivity/100.0 * 2.0);
+	double x_translate, y_translate, z_translate;
+	MouseDelta2ObjectDelta(x_amt, y_amt, &x_translate, &y_translate, &z_translate);
+	x_translate = (m_nAxis == ID_AXIS_X || m_nAxis == ID_AXIS_XY)  ? x_translate*factor  : 0;
+	y_translate = (m_nAxis == ID_AXIS_Y || m_nAxis == ID_AXIS_XY)  ? y_translate*factor  : 0;
+	z_translate = (m_nAxis == ID_AXIS_Z)  ? z_translate*factor  : 0;
 
 	if (m_nSpace == ID_ACTION_OBJECTSPACE || m_nSpace == ID_ACTION_TEXTURETRANSFORMATIONS)
 		glTranslated(x_translate, y_translate, z_translate);
@@ -1045,31 +1023,36 @@ void COpenGLView::TranslateModel(double x_amt, double y_amt)
 	}
 }
 
-void COpenGLView::RotateModel(double x_amt, double y_amt)
+void COpenGLView::RotateModel(int x_amt, int y_amt)
 {
-	const double factor = 20.0;
-	x_amt *= factor; y_amt *= factor;
+	double rotate_axis_x, rotate_axis_y, rotate_axis_z;
+	double rotate_amt;
 
-	double	rotate_amt = (x_amt + y_amt) * factor,
-			rotate_axis_x, rotate_axis_y, rotate_axis_z;
-
+	double factor = 2.0 * (m_mouseSensitivity/100.0 * 2.0);
+	static const double xy_balance = 10.0;
+	
 	switch (m_nAxis)
 	{
 	case ID_AXIS_X:
+		rotate_amt = (-y_amt*factor/m_WindowWidth) * 360;
 		rotate_axis_x = 1.0;
-		rotate_axis_y = rotate_axis_z = 0.0;
+		rotate_axis_y = rotate_axis_z = 0;
 		break;
 	case ID_AXIS_Y:
+		rotate_amt = (x_amt*factor/m_WindowHeight) * 360;
 		rotate_axis_y = 1.0;
-		rotate_axis_x = rotate_axis_z = 0.0;
+		rotate_axis_x = rotate_axis_z = 0;
 		break;
 	case ID_AXIS_Z:
+		rotate_amt = (x_amt*factor/m_WindowHeight) * 360;
 		rotate_axis_z = 1.0;
-		rotate_axis_x = rotate_axis_y = 0.0;
+		rotate_axis_x = rotate_axis_y = 0;
 		break;
 	case ID_AXIS_XY:
-		rotate_axis_x = rotate_axis_y = 1.0;
-		rotate_axis_z = 0.0;
+		rotate_amt = (x_amt*factor/m_WindowWidth + y_amt*factor/m_WindowHeight) * 180;
+		rotate_axis_z = 0;
+		rotate_axis_x = -1.0;
+		rotate_axis_y = 1.0;
 		break;
 	}
 
@@ -1114,61 +1097,31 @@ void COpenGLView::RotateModel(double x_amt, double y_amt)
 }
 
 
-void COpenGLView::ScaleModel(double x_amt, double y_amt)
+void COpenGLView::ScaleModel(int x_amt, int y_amt)
 {
-	// parameters are passed as a multiple of the object size - but we want them as values
-	// vetween 0 and 1!!!
+	double factor = 1.0 * (m_mouseSensitivity/100.0 * 2.0);
+	double	x_scale = 1 + (x_amt*factor / m_WindowWidth),
+			y_scale = 1 + (y_amt*factor / m_WindowHeight),
+			z_scale = y_scale;
 
-	double objSize;
-
-	if (objectData != NULL)
-	{
-		objSize = max(objectData->bbox.xSize(), objectData->bbox.ySize());
-		objSize = max(objSize, objectData->bbox.zSize());
-	} else 
-	{
-		objSize = 2;
+	if (m_nAction == ID_ACTION_UNIFORMSCALING) {
+		x_scale = y_scale = z_scale = (x_scale + y_scale)/2;
+	} else {
+		x_scale = (m_nAxis == ID_AXIS_X || m_nAxis == ID_AXIS_XY)  ? x_scale  : 1.0;
+		y_scale = (m_nAxis == ID_AXIS_Y || m_nAxis == ID_AXIS_XY)  ? y_scale  : 1.0;
+		z_scale = (m_nAxis == ID_AXIS_Z)  ? z_scale  : 1.0;
 	}
 
-	x_amt *= objSize;
-	y_amt *= objSize;
-
-	const double factor = 1.0;
-	double scale_amt = (1 - x_amt - y_amt) * factor;
-
 	if (m_nSpace == ID_ACTION_OBJECTSPACE || m_nSpace == ID_ACTION_TEXTURETRANSFORMATIONS)
-		scaleAccordingToAxis(scale_amt);
+		glScaled(x_scale, y_scale, z_scale);
 	else
 	{
 		// view-space transformation
 		GLdouble currentMatrix[16];
 		glGetDoublev(GL_MODELVIEW_MATRIX, &currentMatrix[0]);
 		glLoadIdentity();
-		scaleAccordingToAxis(scale_amt);
+		glScaled(x_scale, y_scale, z_scale);
 		glMultMatrixd(&currentMatrix[0]);
-	}
-}
-
-void COpenGLView::scaleAccordingToAxis(double scale_amt){
-	if(ID_ACTION_UNIFORMSCALING == m_nAction){
-		glScaled(scale_amt, scale_amt, scale_amt);
-	}
-	else{
-		switch (m_nAxis)
-		{
-		case ID_AXIS_X:
-			glScaled(scale_amt, 1, 1);
-			break;
-		case ID_AXIS_Y:
-			glScaled(1, scale_amt, 1);
-			break;
-		case ID_AXIS_Z:
-			glScaled(1, 1, scale_amt);
-			break;
-		case ID_AXIS_XY:
-			glScaled(scale_amt, scale_amt, 1);
-			break;
-		}
 	}
 }
 
@@ -1371,20 +1324,7 @@ void COpenGLView::OnUpdateOptionsShowfacesnormals(CCmdUI *pCmdUI)
 
 void COpenGLView::OnOptionsPerspectivecontrol()
 {
-	CPerspectiveOptionsDialog dlg(m_dVal);
-	if (dlg.DoModal() == IDOK) {
-		CString val(dlg.m_dVal);//dlg.m_floatVal);
-		
-		double data = atof(val);
-		if (data > 0){
-			m_dVal = data;
-		}
-		else{
-			CString error("Please insert a number larger than 0");
-			AfxMessageBox(error);
-		}
-
-	}
+	AfxMessageBox("This option not implemented");
 }
 
 void COpenGLView::ApplyLatestTransform(void)
@@ -1618,4 +1558,83 @@ void COpenGLView::OnMaterialLoadmipmap()
 		objectData->m_objects[obj]->m_textureManager.addPTexture(file.c_str(), true, true);
 		m_recompile = true;
 	}
+}
+
+/**	This helper function calculates how much an object should be transformed
+	(translated, scaled) in object coordinates to match a given movement in
+	screen coordinates. For consistency we calculate the projections using the
+	following mouse location values:
+	Before: screen.center.x, screen.center.y, object.center.z
+	After: screen.center.x + dx, screen.center.y + dy, object.center.z
+**/
+void COpenGLView::MouseDelta2ObjectDelta(int dx, int dy, double* obj_dx, double* obj_dy, double* obj_dz)
+{
+	double	modelMatrix[16],
+			projMatrix[16];
+	int viewportMatrix[4];
+
+	glGetDoublev(GL_MODELVIEW_MATRIX, &modelMatrix[0]);
+	glGetDoublev(GL_PROJECTION_MATRIX, &projMatrix[0]);
+	glGetIntegerv(GL_VIEWPORT, &viewportMatrix[0]);
+
+	double	winx_before = m_WindowWidth/2,
+			winy_before = m_WindowHeight/2,
+			winz_before = 0,
+			t;
+	double	center[4] = {	(objectData) ? objectData->bbox.GetCenterX() : 0,
+							(objectData) ? objectData->bbox.GetCenterY() : 0,
+							(objectData) ? objectData->bbox.GetCenterZ() : 0,
+							1.0													};
+
+	// we need to apply the modelview and projection matrices to the center-point!
+	
+
+	ApplyMatrix(center, modelMatrix, true);
+
+	// first convert object-z center to screen z-center
+	gluProject(	center[0], center[1], center[2],
+				modelMatrix, projMatrix, viewportMatrix,
+				&t, &t, &winz_before);
+
+	double objx_before, objy_before, objz_before;
+
+	// calculate "BEFORE" coordinates
+	if (!	gluUnProject(	winx_before, winy_before, winz_before,
+							modelMatrix, projMatrix, viewportMatrix,
+							&objx_before, &objy_before, &objz_before		)	)
+		AfxMessageBox("Failed projecting BEFORE coordinates");
+
+	double objx_after, objy_after, objz_after;
+
+	// calculate "AFTER" coordinates
+	if (!	gluUnProject(	winx_before + dx, winy_before + dy, winz_before,
+							modelMatrix, projMatrix, viewportMatrix,
+							&objx_after, &objy_after, &objz_after		)	)
+		AfxMessageBox("Failed projecting AFTER coordinates");
+
+	static const double factor = 0.3;	// heuristic
+	*obj_dx = (objx_after - objx_before) * factor;
+	*obj_dy = (objy_after - objy_before) * factor;
+	*obj_dz = *obj_dy;
+}
+
+/**	Apply transformation matrix m to point vector v=(x,y,z,w). After the transformation v
+	contains vM
+**/
+void COpenGLView::ApplyMatrix(double v[4], double m[16], bool normalize)
+{
+	double v_[4] = {0};
+
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
+			v_[i] += m[4*i + j] * v[j];
+
+	if (normalize) {
+		for (int i = 0; i < 4; i++)
+			v_[i] /= v_[3];
+	}
+
+	// copy result
+	for (int i = 0; i < 4; i++)
+		v[i] = v_[i];
 }
