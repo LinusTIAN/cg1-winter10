@@ -396,10 +396,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\PerspectiveOptionsDialog.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\PngWrapper.cpp"
 				>
 			</File>
@@ -530,10 +526,6 @@
 			</File>
 			<File
 				RelativePath="OpenGLView.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PerspectiveOptionsDialog.h"
 				>
 			</File>
 			<File

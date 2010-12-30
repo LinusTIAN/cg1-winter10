@@ -107,7 +107,6 @@ protected:
 
 private:
 	void draw_axis();
-	void scaleAccordingToAxis(double scale_amt);
 	void lightReset();
 	void materialReset();
 	void setupLightInScene();
@@ -151,9 +150,9 @@ public:
 	CPoint m_lastCtrlPoint;
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 protected:
-	void TranslateModel(double x_amt, double y_amt);
-	void RotateModel(double x_amt, double y_amt);
-	void ScaleModel(double x_amt, double y_amt);
+	void TranslateModel(int x_amt, int y_amt);
+	void RotateModel(int x_amt, int y_amt);
+	void ScaleModel(int x_amt, int y_amt);
 public:
 	afx_msg void OnActionObjectspace();
 	afx_msg void OnUpdateActionObjectspace(CCmdUI *pCmdUI);
@@ -202,6 +201,10 @@ public:
 	afx_msg void OnMaterialTesselation();
 	afx_msg void OnUpdateMaterialTesselation(CCmdUI *pCmdUI);
 	afx_msg void OnMaterialLoadmipmap();
+protected:
+	void MouseDelta2ObjectDelta(int dx, int dy, double* obj_dx, double* obj_dy, double* obj_dz);
+public:
+	void ApplyMatrix(double v[3], double m[16], bool normalize = false);
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp
