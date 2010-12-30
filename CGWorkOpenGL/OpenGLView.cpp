@@ -664,7 +664,7 @@ void COpenGLView::OnViewOrthographic()
 	m_nView = ID_VIEW_ORTHOGRAPHIC;
 	m_bIsPerspective = false;
 
-	if ( !SetupCamera(true) )
+	if ( !SetupCamera() )
 	{
 		::AfxMessageBox("Error while trying to setup camera.");
 	}
@@ -681,7 +681,7 @@ void COpenGLView::OnViewPerspective()
 	m_nView = ID_VIEW_PERSPECTIVE;
 	m_bIsPerspective = true;
 
-	if ( !SetupCamera(true) )
+	if ( !SetupCamera() )
 	{
 		::AfxMessageBox("Error while trying to setup camera.");
 	}
@@ -1174,10 +1174,6 @@ void COpenGLView::scaleAccordingToAxis(double scale_amt){
 
 bool COpenGLView::SetupCamera(bool resetTransforms)
 {
-	glMatrixMode(GL_PROJECTION);
-	glPopMatrix();
-	glPushMatrix();		// restore identity matrix
-
 	// define near + far planes
 	this->m_zNear = 0.1,
 	this->m_zFar = 20.0;
@@ -1192,15 +1188,15 @@ bool COpenGLView::SetupCamera(bool resetTransforms)
 
 	bool ret;
 
-	if (m_bIsPerspective)
-	{
-		ret = SetupViewingFrustum();
-	}
-	else
-	{
-		ret = SetupViewingOrthoConstAspect();
-	}
-		
+	/**	We want to perform all camera manipulations the same for both viewing modes.
+		If we setup perspective projection here, the scaling calculation later on will
+		be incorrect. Therefore, we setup orthographic projection and later fix the
+		projection matrix if this is incorrect.
+	**/
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glPushMatrix();		// restore identity matrix
+	ret = SetupViewingOrthoConstAspect();
 	glMatrixMode(GL_MODELVIEW);
 
 	if (!ret)
@@ -1213,10 +1209,11 @@ bool COpenGLView::SetupCamera(bool resetTransforms)
 		glPushMatrix();
 		glPushMatrix();
 
-		if (objectData != NULL && !m_bIsPerspective)
+		if (objectData != NULL)
 		{
-			// scale the model so it fits on  about 3/4 of the screen
-			// (only in ortho view - in perspective view we move it on z axis instead and that scales the object)
+			// scale the model so it fits on  about 3/4 of the screen in orthographic view
+			// we fix the distortion this creates in perspective view later with a translation
+			// down the Z axis
 			
 			double	modelMatrix[16],
 					projMatrix[16];
@@ -1261,7 +1258,6 @@ bool COpenGLView::SetupCamera(bool resetTransforms)
 
 			distance = (0.5*size_y) / std::sin(radFovY_half);
 			distance += objectData->bbox.zSize();	// don't forget the object isn't flat...
-			distance = distance * 2 / 3;	// don't want it to fill the whole screen
 		}
 
 		// get the size of the object (either loaded model or default axes) in the z plane
@@ -1280,6 +1276,18 @@ bool COpenGLView::SetupCamera(bool resetTransforms)
 
 		ApplyLatestTransform();	// apply this _NOT JUST_ for current transformation but to the ones to follow as well
 	}
+
+	/**	If we should be in projection mode fix it now! **/
+	if (m_bIsPerspective) {
+		glMatrixMode(GL_PROJECTION);
+		glPopMatrix();
+		glPushMatrix();		// restore identity matrix
+		ret = SetupViewingFrustum();
+		glMatrixMode(GL_MODELVIEW);
+	}
+
+	if (!ret)
+		return ret;
 
 	if ( GL_NO_ERROR != ::glGetError() ) {
 		::AfxMessageBox("Error while trying to set camera position.");
