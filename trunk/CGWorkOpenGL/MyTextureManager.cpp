@@ -17,13 +17,16 @@ MyTextureManager::MyTextureManager(void)
 {
 	m_enabled = true;
 	m_showTexture = false;
-	m_checkImage = NULL;
+	for (int i = 0; i < 64; i++)
+		m_checkImage[i] = NULL;
 	m_isAuto = true;
+	m_textureFile = "";
+	m_mipmapMode = false;
 }
 
 MyTextureManager::~MyTextureManager(void)
 {
-	if (m_checkImage != NULL){
+	if (m_checkImage[0] != NULL){
 		glDeleteTextures(1,&m_texture);
 		//delete m_checkImage;
 	}
@@ -42,7 +45,7 @@ int MyTextureManager::nearestPower( int value )
 }
 
 
-void MyTextureManager::addPTexture(const char *str, bool fullPath){
+void MyTextureManager::addPTexture(const char *str, bool fullPath, bool mipmap){
 	
 	string s(str);
 	string fileName(str);
@@ -66,35 +69,58 @@ void MyTextureManager::addPTexture(const char *str, bool fullPath){
 		fileName = MyTextureManager::m_textureDir + "\\" + fileName+ "png";
 	}
 
-	PngWrapper wrapper;
-	wrapper.SetFileName(fileName.c_str());
-	if (!wrapper.ReadPng()){
-		AfxMessageBox("Texture file can not be read");
-		return ;
+	m_textureFile = fileName;
+
+	if (!mipmap)
+	{
+		// setup a regular texture
+		PngWrapper wrapper;
+		wrapper.SetFileName(fileName.c_str());
+		if (!wrapper.ReadPng()){
+			AfxMessageBox("Texture file can not be read");
+			return ;
+		}
+		bindTexture(&wrapper);
+	} else
+	{
+		// setup a mip-mapped texture
+		m_mipmapMode = true;
+		PngWrapper wrapper;
+
+		for (	int i = 0;
+				wrapper.GetHeight() != 1 || wrapper.GetWidth() != 1;
+				i++		) {
+			fileName.replace(fileName.length() - 5, 5, string(1, 'a'+i) + ".png");	// generate filename for next mipmaps
+			wrapper.SetFileName( fileName.c_str() );
+			if (!wrapper.ReadPng()) {
+				AfxMessageBox("Texture file can not be read");
+				return ;
+			}
+			bindTexture(&wrapper, i);
+		}
 	}
 
 	m_showTexture = true;
-	bindTexture(&wrapper);
 }
 
 
-void MyTextureManager::bindTexture(PngWrapper* wrapper){
+void MyTextureManager::bindTexture(PngWrapper* wrapper, int level) {
 	
 	// Read the texture image
 	int imageWidth  = wrapper->GetWidth();
 	int imageHeight = wrapper->GetHeight();
 
-	m_checkImage = new GLubyte[imageWidth*imageHeight*4*sizeof(GLubyte)];
+	m_checkImage[level] = new GLubyte[imageWidth*imageHeight*4];
 
 	int color;
 	for (int i = 0; i < imageHeight; i++) {
 		for (int j = 0; j < imageWidth; j++) {
 			color = wrapper->GetValue(j,i);
 			if(i*imageWidth*4 + j*4 +3 < imageWidth*imageHeight*4){
-				m_checkImage[i*imageWidth*4 + j*4 +0] = (GLubyte)  GET_R(color);
-				m_checkImage[i*imageWidth*4 + j*4 +1] = (GLubyte)  GET_G(color);
-				m_checkImage[i*imageWidth*4 + j*4 +2] = (GLubyte)  GET_B(color);
-				m_checkImage[i*imageWidth*4 + j*4 +3] = (GLubyte) 255;
+				m_checkImage[level][i*imageWidth*4 + j*4 +0] = (GLubyte)  GET_R(color);
+				m_checkImage[level][i*imageWidth*4 + j*4 +1] = (GLubyte)  GET_G(color);
+				m_checkImage[level][i*imageWidth*4 + j*4 +2] = (GLubyte)  GET_B(color);
+				m_checkImage[level][i*imageWidth*4 + j*4 +3] = (GLubyte) 255;
 			}
 			else
 				assert (0);
@@ -108,24 +134,27 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper){
 
     //scale texture image to 2^m by 2^n if necessary 
     if ( m_sWidth == imageWidth && m_sHeight == imageHeight ) {
-         m_sImage = (GLubyte *) m_checkImage;
+         m_sImage[level] = (GLubyte *) m_checkImage[level];
     } else {
-         m_sImage = (GLubyte *)malloc( m_sHeight*m_sWidth*4*sizeof( GLubyte ) );
+         m_sImage[level] = (GLubyte *)malloc( m_sHeight*m_sWidth*4*sizeof( GLubyte ) );
          gluScaleImage( GL_RGBA, imageWidth, imageHeight, 
-                        GL_UNSIGNED_BYTE, m_checkImage,
-                        m_sWidth, m_sHeight, GL_UNSIGNED_BYTE, m_sImage );
-		 delete m_checkImage;
+                        GL_UNSIGNED_BYTE, m_checkImage[level],
+                        m_sWidth, m_sHeight, GL_UNSIGNED_BYTE, m_sImage[level] );
+		 delete m_checkImage[level];
     }
 	
 	// Define texture
-	m_texture = 0;
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1,  &m_texture);
-	glBindTexture(GL_TEXTURE_2D, m_texture);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_sWidth, 
+	if (!level) {
+		// only generate for regular textures or for first level of mipmap
+		glGenTextures(1, &m_texture);
+	}
+
+	glBindTexture(GL_TEXTURE_2D, m_texture);
+	glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA, m_sWidth, 
 						m_sHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 
-						m_sImage);
+						m_sImage[level]);
 	//delete m_checkImage;
 }
 
@@ -146,8 +175,8 @@ void MyTextureManager::set(){
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, sWrapMode);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, tWrapMode);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,   GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,   GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, m_mipmapMode ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 
 			
 			if (m_materialManager.m_sAuto){

@@ -1,7 +1,7 @@
 [OBJECT NONE
     [OBJECT TEAPOT
         [OBJECT
-		[ptexture "door3.png"]
+		[ptexture "door3_a.png"]
             [color 4]
             BODY
             [SURFACE BSPLINE 10 13 4 4 E3
