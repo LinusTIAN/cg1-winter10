@@ -94,7 +94,7 @@ void MyTextureManager::addPTexture(const char *str, bool fullPath, bool mipmap){
 			wrapper.SetFileName( fileName.c_str() );
 			if (!wrapper.ReadPng()) {
 				AfxMessageBox("Texture file can not be read");
-				return ;
+				return;
 			}
 			bindTexture(&wrapper, i);
 		}

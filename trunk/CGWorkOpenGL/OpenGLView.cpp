@@ -18,6 +18,7 @@ using std::endl;
 #include "PerspectiveOptionsDialog.h"
 #include "MaterialDlg.h"
 #include "FogDialog.h"
+#include "LoadTextureDlg.h"
 
 #include "globals.h"
 
@@ -114,6 +115,7 @@ BEGIN_MESSAGE_MAP(COpenGLView, CView)
 	ON_COMMAND(ID_RESET_VIEW, &COpenGLView::OnResetView)
 	ON_COMMAND(ID_MATERIAL_TESSELATION, &COpenGLView::OnMaterialTesselation)
 	ON_UPDATE_COMMAND_UI(ID_MATERIAL_TESSELATION, &COpenGLView::OnUpdateMaterialTesselation)
+	ON_COMMAND(ID_MATERIAL_LOADMIPMAP, &COpenGLView::OnMaterialLoadmipmap)
 END_MESSAGE_MAP()
 
 
@@ -1581,3 +1583,31 @@ void COpenGLView::setTesselation(bool bTesselation){
 	}
 }
 
+
+void COpenGLView::OnMaterialLoadmipmap()
+{
+	string *objectNames;
+	int len;
+
+	if (objectData) {
+		len = objectData->m_nextObj;
+		objectNames = new string[len];
+		for (int i = 0; i < len; i++)
+			objectNames[i] = objectData->m_objects[i]->m_name;
+	} else {
+		len = 0;
+		objectNames = NULL;
+	}
+
+	LoadTextureDlg dlg(objectNames, len);
+
+	if (dlg.DoModal() == IDOK) {
+		if (!objectData) return;	// just in case...
+
+		int obj = dlg.m_objSelected;
+		string file = dlg.m_filePath;
+		
+		objectData->m_objects[obj]->m_textureManager.addPTexture(file.c_str(), true, true);
+		m_recompile = true;
+	}
+}

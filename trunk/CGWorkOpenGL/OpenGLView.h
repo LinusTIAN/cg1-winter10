@@ -201,6 +201,7 @@ public:
 	afx_msg void OnResetView();
 	afx_msg void OnMaterialTesselation();
 	afx_msg void OnUpdateMaterialTesselation(CCmdUI *pCmdUI);
+	afx_msg void OnMaterialLoadmipmap();
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp

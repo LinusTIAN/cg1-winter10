@@ -232,6 +232,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LoadTextureDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath="MainFrm.cpp"
 				>
 				<FileConfiguration
@@ -450,6 +454,10 @@
 			</File>
 			<File
 				RelativePath=".\LightDialog.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LoadTextureDlg.h"
 				>
 			</File>
 			<File
