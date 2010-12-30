@@ -144,10 +144,18 @@ void MyPolygon::drawTesselated(GLUtesselator* tobj){
 				shade = 0.1;	// maintain /some/ ambient light...
 				glColor3d(shade, shade, shade);
 		}
-		pcArr[i] = new GLdouble[6];
+		pcArr[i] = new GLdouble[9];
 		pcArr[i][0] = m_vertices[i].x;
 		pcArr[i][1] = m_vertices[i].y;
 		pcArr[i][2] = m_vertices[i].z;
+
+		pcArr[i][3] = m_vertices[i].m_hasUV;
+		pcArr[i][4] = m_vertices[i].m_u;
+		pcArr[i][5] = m_vertices[i].m_v;
+
+		pcArr[i][6] = m_vertices[i].normal.m_x;
+		pcArr[i][7] = m_vertices[i].normal.m_y;
+		pcArr[i][8] = m_vertices[i].normal.m_z;
 		gluTessVertex(tobj, pcArr[i], pcArr[i]);
 	}
 
