@@ -103,13 +103,15 @@
 #define ID_RESET_VIEW                   32842
 #define ID_MATERIAL_TESSELATION         32843
 #define ID_MATERIAL_LOADMIPMAP          32844
+#define ID_ADVANCED_LOADBACKGROUNG      32845
+#define ID_ADVANCED_EXPORTIMAGE         32846
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        146
-#define _APS_NEXT_COMMAND_VALUE         32845
+#define _APS_NEXT_COMMAND_VALUE         32847
 #define _APS_NEXT_CONTROL_VALUE         1065
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

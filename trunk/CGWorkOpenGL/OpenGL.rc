@@ -153,6 +153,11 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "Tessellation",                ID_MATERIAL_TESSELATION
     END
+    POPUP "&Advanced"
+    BEGIN
+        MENUITEM "&Load Backgroungd Image...",  ID_ADVANCED_LOADBACKGROUNG
+        MENUITEM "&Export Image...",            ID_ADVANCED_EXPORTIMAGE
+    END
     POPUP "&Help"
     BEGIN
         MENUITEM "&About OpenGL...",            ID_APP_ABOUT
