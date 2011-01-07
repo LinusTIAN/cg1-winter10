@@ -115,12 +115,11 @@ void MyTextureManager::bindTexture(PngWrapper* wrapper, int level) {
 	int color;
 	for (int i = 0; i < imageHeight; i++) {
 		for (int j = 0; j < imageWidth; j++) {
-			color = wrapper->GetValue(j,i);
+			color = wrapper->GetValue(j,imageHeight-i);
 			if(i*imageWidth*4 + j*4 +3 < imageWidth*imageHeight*4){
 				m_checkImage[level][i*imageWidth*4 + j*4 +0] = (GLubyte)  GET_R(color);
 				m_checkImage[level][i*imageWidth*4 + j*4 +1] = (GLubyte)  GET_G(color);
 				m_checkImage[level][i*imageWidth*4 + j*4 +2] = (GLubyte)  GET_B(color);
-				m_checkImage[level][i*imageWidth*4 + j*4 +3] = (GLubyte) 255;
 			}
 			else
 				assert (0);

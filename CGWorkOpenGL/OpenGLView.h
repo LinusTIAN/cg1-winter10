@@ -16,6 +16,7 @@
 
 #include "Light.h"
 #include "atltypes.h"
+#include "My3dObject.h"
 #include "MyLight.h"
 #include "MyFogPrameters.h"
 #include "MyMaterialManager.h"
@@ -45,6 +46,7 @@ private:
 	int m_nView;				// Orthographic, perspective
 	int m_nSpace;				// Object/View-space/texture transform
 	bool m_bIsPerspective;			// is the view perspective
+	My3dObject* m_backgroundObj;
 	
 	CString m_strItdFileName;		// file name of IRIT data
 
@@ -92,6 +94,8 @@ protected:
 	BOOL SetupViewingOrthoConstAspect(void);
 
 	virtual void RenderScene();
+
+	bool GetFolder(string& folderpath);
 
 
 	HGLRC    m_hRC;			// holds the Rendering Context
@@ -205,6 +209,8 @@ protected:
 	void MouseDelta2ObjectDelta(int dx, int dy, double* obj_dx, double* obj_dy, double* obj_dz);
 public:
 	void ApplyMatrix(double v[3], double m[16], bool normalize = false);
+	afx_msg void OnAdvancedLoadbackgroung();
+	afx_msg void OnAdvancedExportimage();
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp

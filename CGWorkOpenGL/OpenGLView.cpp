@@ -10,6 +10,8 @@
 using std::cout;
 using std::endl;
 #include <math.h>
+#include "shlobj.h"
+
 
 #include "MaterialDlg.h"
 #include "LightDialog.h"
@@ -115,6 +117,8 @@ BEGIN_MESSAGE_MAP(COpenGLView, CView)
 	ON_COMMAND(ID_MATERIAL_TESSELATION, &COpenGLView::OnMaterialTesselation)
 	ON_UPDATE_COMMAND_UI(ID_MATERIAL_TESSELATION, &COpenGLView::OnUpdateMaterialTesselation)
 	ON_COMMAND(ID_MATERIAL_LOADMIPMAP, &COpenGLView::OnMaterialLoadmipmap)
+	ON_COMMAND(ID_ADVANCED_LOADBACKGROUNG, &COpenGLView::OnAdvancedLoadbackgroung)
+	ON_COMMAND(ID_ADVANCED_EXPORTIMAGE, &COpenGLView::OnAdvancedExportimage)
 END_MESSAGE_MAP()
 
 
@@ -134,6 +138,7 @@ COpenGLView::COpenGLView()
 , m_lastCtrlPoint(0)
 , m_mouseScreenZ(0)
 {
+	m_backgroundObj = NULL;
 	m_showTesselation = false;
 	m_mouseSensitivity = 50;
 	m_showBoundingBox = false; 
@@ -610,6 +615,14 @@ void COpenGLView::RenderScene() {
 			glColor3f(1, 0, 0);
 			objectData->DrawBoundingBox();
 		}
+
+		if (m_backgroundObj != NULL){
+			GLdouble currentMatrix[16];
+			glGetDoublev(GL_MODELVIEW_MATRIX, &currentMatrix[0]);
+			glLoadIdentity();
+			m_backgroundObj->Draw();
+			glMultMatrixd(&currentMatrix[0]);
+		}
 	}
 
 	return;
@@ -623,6 +636,8 @@ void COpenGLView::OnFileLoad()
 	CFileDialog dlg(TRUE, "itd", "*.itd", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY ,szFilters);
 
 	if (dlg.DoModal () == IDOK) {
+		delete m_backgroundObj;
+		m_backgroundObj = NULL;
 		delete objectData;
 		objectData = new MyCompositeObject();
 
@@ -1637,4 +1652,112 @@ void COpenGLView::ApplyMatrix(double v[4], double m[16], bool normalize)
 	// copy result
 	for (int i = 0; i < 4; i++)
 		v[i] = v_[i];
+}
+
+void COpenGLView::OnAdvancedLoadbackgroung()
+{
+	if (objectData==NULL)
+		return;
+
+	TCHAR szFilters[] = _T ("Png Files (*.png)|*.png|All Files (*.*)|*.*||");
+	CFileDialog dlg(TRUE, "png", "*.png", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY ,szFilters);
+
+	if (dlg.DoModal () == IDOK) {
+		if (m_backgroundObj!=NULL)
+			delete m_backgroundObj;
+
+		std::string sFileName(dlg.GetPathName());	
+		m_backgroundObj = new My3dObject("Background");
+		
+		for (int j=0; j<3; j++)
+			m_backgroundObj->m_color[j] = 1.0;
+
+		m_backgroundObj->addPTexture(sFileName.c_str(),true);
+
+		//TODO: -100 : ask slava why the object moves
+		//TODO: ask slava about prespective
+
+		int xSize = 1*(objectData->bbox.x_max - objectData->bbox.x_min);
+		int ySize = 1.6*(objectData->bbox.y_max - objectData->bbox.y_min);
+
+		MyPolygon *poly = new MyPolygon(4);
+		MyVertex v1(objectData->bbox.GetCenterX()-xSize,objectData->bbox.GetCenterY()-ySize,objectData->bbox.z_min-100);
+		v1.setNormal(0,0,1);
+		v1.setUV(0,0);
+		MyVertex v2(objectData->bbox.GetCenterX()+xSize,objectData->bbox.GetCenterY()-ySize,objectData->bbox.z_min-100);
+		v2.setNormal(0,0,1);
+		v2.setUV(1,0);
+		MyVertex v3(objectData->bbox.GetCenterX()+xSize,objectData->bbox.GetCenterY()+ySize,objectData->bbox.z_min-100);
+		v3.setNormal(0,0,1);
+		v3.setUV(1,1);
+		MyVertex v4(objectData->bbox.GetCenterX()-xSize,objectData->bbox.GetCenterY()+ySize,objectData->bbox.z_min-100);
+		v4.setNormal(0,0,1);
+		v4.setUV(0,1);
+		poly->AddVertex(v1);
+		poly->AddVertex(v2);
+		poly->AddVertex(v3);
+		poly->AddVertex(v4);
+		m_backgroundObj->AddPolyRef(poly);
+		
+		m_recompile = true;
+		Invalidate();
+	}
+}
+
+bool COpenGLView::GetFolder(string& folderpath){
+	bool retVal = false;
+	BROWSEINFO bi;
+	memset(&bi, 0, sizeof(bi));
+
+	bi.ulFlags   = BIF_USENEWUI;
+	bi.hwndOwner = NULL;
+	bi.lpszTitle = NULL;
+	::OleInitialize(NULL);
+	LPITEMIDLIST pIDL = ::SHBrowseForFolder(&bi);
+	if(pIDL != NULL)
+	{
+		char buffer[_MAX_PATH] = {'\0'};
+		if(::SHGetPathFromIDList(pIDL, buffer) != 0)
+		{
+			folderpath = buffer;
+			retVal = true;
+		}
+		CoTaskMemFree(pIDL);
+	}
+	::OleUninitialize();
+
+	return retVal;
+}
+void COpenGLView::OnAdvancedExportimage()
+{
+	string folderpath;
+	if (!GetFolder(folderpath))
+		return;
+	
+	int* viewport = new int[4];
+	glGetIntegerv( GL_VIEWPORT, viewport);
+	char* image =(char*) malloc(3 * viewport[2] * viewport[3]);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glReadPixels(0, 0, viewport[2], viewport[3], GL_RGB, GL_UNSIGNED_BYTE, image);
+
+	int imageWidth  = viewport[2];
+	int imageHeight = viewport[3];
+
+	string fileName(folderpath+"\\background.png");
+	PngWrapper wrapper;
+	wrapper.SetFileName(fileName.c_str());
+	wrapper.SetHeight(imageHeight);
+	wrapper.SetWidth(imageWidth);
+	wrapper.InitWritePng();
+
+	for (int i = 0; i < imageWidth; i++) {
+		for (int j = 0; j < imageHeight; j++) {
+			byte r = image[j*imageWidth*3 + i*3 +0];
+			byte g = image[j*imageWidth*3 + i*3 +1];
+			byte b = image[j*imageWidth*3 + i*3 +2];
+			wrapper.SetValue(i,imageHeight-j,SET_RGB(r,g,b));
+		}
+	}
+	
+	wrapper.WritePng();
 }
