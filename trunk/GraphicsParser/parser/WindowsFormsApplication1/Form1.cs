@@ -48,13 +48,18 @@ namespace WindowsFormsApplication1
             System.IO.File.Delete(fileName);
             System.IO.File.Create(fileName).Close();
 	//[ptexture \"door3.png\"]
-            string fileContent = "[OBJECT MyObj  \n";
+            string fileContent = "[OBJECT MyObj  \n [OBJECT aroom1 \n";
+
+            fileContent += "[OBJECT WALLS \n ";//[OBJECT [TextureMaterial _REFPTR_ATTR_NOT_CNVRTED_] \n[ptextureStamp 0] ";
+	       // fileContent += " [PartID 0] [rgb \"255, 255, 255\"] ";
+          // fileContent += " [ptexture \"door3.png\"] ";
+
 
             foreach(MyPolygon p in m_myPolygonList){
-                fileContent += "\t[POLYGON   [color 4] [PLANE 0 -1 0 0.5] "+p.m_verList.Count.ToString()+"\n";
+                fileContent += "\t[POLYGON  [PLANE 0 -1 0 0.5] "+p.m_verList.Count.ToString()+"\n";
                 foreach (MyVertex v in p.m_verList)
                 {
-                    fileContent += "\t   [[rgb \"0,0,255\"]  [NORMAL ";
+                    fileContent += "\t   [ [NORMAL ";
                     fileContent += v.n1.ToString() + " ";
                     fileContent += v.n2.ToString() + " ";
                     fileContent += v.n3.ToString() + "] ";
@@ -64,7 +69,7 @@ namespace WindowsFormsApplication1
                 }
                 fileContent += "\t]\n";
             }
-            fileContent += "]\n";               
+            fileContent += "]\n ] \n ] \n ";               
 
 
             StreamWriter sw = new StreamWriter(fileName);
