@@ -587,52 +587,30 @@ void COpenGLView::draw_axis()
 
 	glColor3f(1,1,1);		// return default color
 }
-/*
-#define PI_ 3.14159265358979323846
 
-void accFrustum(GLdouble left, GLdouble right, GLdouble bottom,
-    GLdouble top, GLdouble near, GLdouble far, GLdouble pixdx, 
-    GLdouble pixdy, GLdouble eyedx, GLdouble eyedy, 
-    GLdouble focus)
+void DrawFloor()								// Draws The Floor
 {
-    GLdouble xwsize, ywsize; 
-    GLdouble dx, dy;
-    GLint viewport[4];
-
-    glGetIntegerv (GL_VIEWPORT, viewport);
-
-    xwsize = right - left;
-    ywsize = top - bottom;
-    dx = -(pixdx*xwsize/(GLdouble) viewport[2] + 
-            eyedx*near/focus);
-    dy = -(pixdy*ywsize/(GLdouble) viewport[3] + 
-            eyedy*near/focus);
-
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glFrustum (left + dx, right + dx, bottom + dy, top + dy, 
-        near, far);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef (-eyedx, -eyedy, 0.0);
+	//glBindTexture(GL_TEXTURE_2D, texture[0]);				// Select Texture 1 (0)
+	glBegin(GL_QUADS);							// Begin Drawing A Quad
+		glNormal3f(0.0, 1.0, 0.0);					// Normal Pointing Up
+		//glTexCoord2f(0.0f, 1.0f);					// Bottom Left Of Texture
+		glVertex3f(-3.0, 0.0, 3.0);					// Bottom Left Corner Of Floor
+		
+		//glNormal3f(0.0, 1.0, 0.0);	
+		//glTexCoord2f(0.0f, 0.0f);					// Top Left Of Texture
+		glVertex3f(-3.0, 0.0,-3.0);					// Top Left Corner Of Floor
+		
+		//glNormal3f(0.0, 1.0, 0.0);	
+		//glTexCoord2f(1.0f, 0.0f);					// Top Right Of Texture
+		glVertex3f( 3.0, 0.0,-3.0);					// Top Right Corner Of Floor
+		
+		//glNormal3f(0.0, 1.0, 0.0);	
+		//glTexCoord2f(1.0f, 1.0f);					// Bottom Right Of Texture
+		glVertex3f( 3.0, 0.0, 3.0);					// Bottom Right Corner Of Floor
+	glEnd();								// Done Drawing The Quad
 }
 
-void accPerspective(GLdouble fovy, GLdouble aspect, 
-    GLdouble near, GLdouble far, GLdouble pixdx, GLdouble pixdy, 
-    GLdouble eyedx, GLdouble eyedy, GLdouble focus)
-{
-    GLdouble fov2,left,right,bottom,top;
-    fov2 = ((fovy*PI_) / 180.0) / 2.0;
 
-    top = near / (fcos(fov2) / fsin(fov2));
-    bottom = -top;
-    right = top * aspect;
-    left = -right;
-
-    accFrustum (left, right, bottom, top, near, far,
-        pixdx, pixdy, eyedx, eyedy, focus);
-}
-*/
 void COpenGLView::RenderScene() {
 	
 	if (objectData != NULL)
@@ -642,31 +620,7 @@ void COpenGLView::RenderScene() {
 			objectData->recompileAll();
 			m_recompile = false;
 		}
-		/*glClearAccum(0.0, 0.0, 0.0, 0.0);
-   
-		GLint viewport[4];
-		int jitter;
-
-		glGetIntegerv (GL_VIEWPORT, viewport);
-
-		int ACSIZE  = 8;
-		glClear(GL_ACCUM_BUFFER_BIT);
-		for (jitter = 0; jitter < ACSIZE; jitter++) {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			accPerspective (50.0, 
-				(GLdouble) viewport[2]/(GLdouble) viewport[3], 
-				1.0, 15.0, j8[jitter].x, j8[jitter].y, 0.0, 0.0, 1.0);
-			
-		glCallList( objectData->GetDisplayList(MyCompositeObject::SELECT_OPAQUE) );
-		glDepthMask(GL_FALSE);	// make z-buffer read-only for rendering transparent objects
-		glCallList( objectData->GetDisplayList(MyCompositeObject::SELECT_TRANSPARENT) );
-		glDepthMask(GL_TRUE);	// restore write permissions for z-buffer
-
-			glAccum(GL_ACCUM, 1.0/ACSIZE);
-	}
-	glAccum (GL_RETURN, 1.0);
-	glFlush();
-*/
+		
 
 		glCallList( objectData->GetDisplayList(MyCompositeObject::SELECT_OPAQUE) );
 		glDepthMask(GL_FALSE);	// make z-buffer read-only for rendering transparent objects
