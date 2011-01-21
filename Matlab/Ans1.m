@@ -1,6 +1,7 @@
 clc
 clear all
 
+%general members
 numOfPictures=11;
 numToAdd=0.1;
 numOfPlotsInRow=4;
@@ -12,7 +13,6 @@ figure();
 subplot(numOfPlotsInRow,numOfPlotsInCol,1);
 imshow(a);
 xlabel('Original RGB picture');
-%a = a./255.0;
 
 hsvImage=rgb2hsv(a); % this function converts the RGB to HSV image
 [i,j,k] = size(hsvImage);
@@ -22,6 +22,7 @@ for currHSV = 1:numOfPictures
     hsvImageNew = hsvImage;
      for row = 1:i
         for col = 1:j
+            %change the saturation
             hsvImageNew(row, col, 2) = hsvImageNew(row, col, 2)*currHSVVal;
 
         end
