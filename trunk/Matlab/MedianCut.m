@@ -1,18 +1,22 @@
-function Y = mediancut(theImage,level) 
+function Y = MedianCut(theImage,level) 
   
-theImage = double(theImage); 
-colorMap = zeros(1,256); % Contains the colors in the original image
+theImage = double(theImage);
+% Contains the colors in the original image
+colorSize=256*256*256+1;
+colorMap = zeros(1,colorSize); 
+maxColor=0;
 for i=1:size(theImage,1) 
     for j=1:size(theImage,2) 
+        %count num of times each color appear
         k=theImage(i,j); 
         colorMap(k+1)=colorMap(k+1)+1; 
+        maxColor=max(maxColor, k+1);
     end 
 end 
   
-y=1; 
-  
-for c=1:256 
-    
+%make an array with all the colors 
+y=1;   
+for c=1:maxColor     
     if colorMap(c)==0 
         continue 
     end 
@@ -68,5 +72,5 @@ for i=a+1:level
     
 end 
   
-Y=uint8(theImage); 
-% end of function 
+%Y=uint8(theImage); 
+Y=theImage; 
