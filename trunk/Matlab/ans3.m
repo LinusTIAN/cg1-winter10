@@ -41,8 +41,7 @@ greyPicture = rgb2gray(OriginalPicture);
 %dither
 [i,j,k] = size(OriginalPicture);
 for row = 1:i
-    for col = 1:j
-   
+    for col = 1:j   
         if (greyPicture(row,col) < threshold_map_16x16(mod(row,16)+1,mod(col,16)+1))
             OriginalPicture(row,col,:)=[0,0,0];
         else
