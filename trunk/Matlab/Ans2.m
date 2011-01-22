@@ -1,43 +1,48 @@
 clc
 clear all
+format long
 
-numOfPictures=11;
-numOfPlotsInRow=1;
-numOfPlotsInCol=2;
-level=3;
+numOfColors = 4;
 
-a=imread('clown.png');
+originalPic = imread('clown.png');
 figure();
-subplot(numOfPlotsInRow,numOfPlotsInCol,1);
-imshow(a);
+subplot(1,2,1);
+imshow(originalPic);
 xlabel('Original RGB picture');
 
-% a=double(a);
-% [i,j,k] = size(a);
+originalPic = double(originalPic);
+[i,j,k] = size(originalPic);
 % for row = 1:i
 %     for col = 1:j
-%             a1=a(row,col,1);
-%             a2=a(row,col,2);
-%             a3=a(row,col,3);
-%             newPic(row, col) = 256*256*a(row,col,1)+256*a(row,col,2)+a(row,col,3);
+%             r = originalPic(row,col,1);
+%             g = originalPic(row,col,2);
+%             b = originalPic(row,col,3);
+%       %      newPic(row, col) = 256*256*originalPic(row,col,1) +256*originalPic(row,col,2)+originalPic(row,col,3);
+%             newPic(row, col) = 256*256*r +256*g+b;
+%         
+%      
 %     end
 % end
 %  
-% newPic = MedianCut(newPic,level);
+% newPic = MedianCut(newPic,numOfColors);
 % 
 % for row = 1:i
 %     for col = 1:j
-%             color = newPic(row,col);
-%             r = uint32(color/256/256)-1;
-%             g = uint32((color-r*256*256)/256);
-%             b = uint32(color-r*256*256-g*256);
-%             a(row, col,1)=r;
-%             a(row, col,2)=g;
-%             a(row, col,3)=b;
+%             color = uint32(newPic(row,col));
+%             r = uint32(mod(color/256/256,256));
+%             g = uint32(mod(color/256,256));
+%             b = uint32(mod(color,256));
+%             
+%             originalPic(row, col,1) = r;
+%             originalPic(row, col,2) = g;
+%             originalPic(row, col,3) = b;
 %     end
 % end
 
-subplot(numOfPlotsInRow,numOfPlotsInCol,2);
-a=uint8(MedianCut(a,level)); 
-imshow(a);
+originalPic(:,:,1) = MedianCut(originalPic(:,:,1),numOfColors);
+originalPic(:,:,2) = MedianCut(originalPic(:,:,2),numOfColors);
+originalPic(:,:,3) = MedianCut(originalPic(:,:,3),numOfColors);
+subplot(1,2,2); 
+originalPic=uint8(originalPic); 
+imshow(originalPic);
 xlabel('Median cut');
