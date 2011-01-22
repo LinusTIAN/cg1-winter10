@@ -63,6 +63,8 @@ private:
 	bool m_showTesselation;
 	double m_backgroundColor[3];
 	double m_dVal;
+	MyBoundingBox* w_bbox;
+	double m_scale;
 	MyFogPrameters m_fogFarams;
 	MyMaterialManager m_materialManager;
 	MyTextureManager m_textureManager;

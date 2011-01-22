@@ -139,6 +139,7 @@ COpenGLView::COpenGLView()
 , m_mouseScreenZ(0)
 {
 	m_backgroundObj = NULL;
+	w_bbox = NULL;
 	m_showTesselation = false;
 	m_mouseSensitivity = 50;
 	m_showBoundingBox = false; 
@@ -407,7 +408,7 @@ BOOL COpenGLView::SetupViewingOrthoConstAspect(void)
 		// Maintain y size and increase x size (and z) accordingly
 		// by MULTIPLYING by the aspect ratio.
 
-		::glOrtho(  -windowSize*m_AspectRatio/2.0, windowSize*m_AspectRatio/2.0,
+		::glOrtho( -windowSize*m_AspectRatio/2.0, windowSize*m_AspectRatio/2.0,
 			-windowSize/2.0, windowSize/2.0, this->m_zNear, this->m_zFar);
 	} else {
 		// Maintain x size and increase y size (and z) accordingly, 
@@ -523,24 +524,6 @@ void COpenGLView::OnDraw(CDC* pDC)
 		}
 		glPopMatrix();
 	}
-
-	glMatrixMode(GL_PROJECTION);
-	GLdouble projMatrix[16];
-	glGetDoublev(GL_PROJECTION_MATRIX, &projMatrix[0]);
-	gluOrtho2D(0.0, (GLfloat) 20, 0.0, (GLfloat) 20);
-
-	
-	glMatrixMode(GL_MODELVIEW);
-	GLdouble viewMatrix[16];
-	glGetDoublev(GL_MODELVIEW_MATRIX, &viewMatrix[0]);
-	makeCheckImage();
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glRasterPos2i(1, 1);   
-    glDrawPixels(checkImageWidth, checkImageHeight, GL_RGB,  GL_UNSIGNED_BYTE, checkImage);
-
-	
-	glMultMatrixd(&projMatrix[0]);
-	glMultMatrixd(&viewMatrix[0]);
     
 	glFlush();
 	SwapBuffers(wglGetCurrentDC());
@@ -676,11 +659,18 @@ void COpenGLView::RenderScene() {
 		}
 
 		if (m_backgroundObj != NULL){
+			int oldView = m_nView;
+			OnViewOrthographic();
+
 			GLdouble currentMatrix[16];
 			glGetDoublev(GL_MODELVIEW_MATRIX, &currentMatrix[0]);
 			glLoadIdentity();
 			m_backgroundObj->Draw();
 			glMultMatrixd(&currentMatrix[0]);
+			if (m_nView != oldView)
+				OnViewPerspective();;
+			m_nView = oldView;
+			
 		}
 	}
 
@@ -1257,14 +1247,16 @@ bool COpenGLView::SetupCamera(bool resetTransforms)
 			gluProject(	objectData->bbox.x_max, objectData->bbox.y_max, objectData->bbox.z_max,
 						modelMatrix, projMatrix, viewportMatrix, &w_xmax, &w_ymax, &w_zmax);
 
-			MyBoundingBox w_bbox(w_xmin, w_xmax, w_ymin, w_ymax, w_zmin, w_zmax);
 
-			double	x_scale = (m_WindowWidth * 3 / 4) / w_bbox.xSize(),
-					y_scale = (m_WindowHeight * 3 / 4) / w_bbox.ySize(),
-					scale = min(x_scale, y_scale);	// if we need to reduce the model then reduce by the maximum amount
+			delete (w_bbox);
+			w_bbox = new MyBoundingBox (w_xmin, w_xmax, w_ymin, w_ymax, w_zmin, w_zmax);
+
+			double	x_scale = (m_WindowWidth * 3 / 4) / w_bbox->xSize(),
+					y_scale = (m_WindowHeight * 3 / 4) / w_bbox->ySize();
+					m_scale = min(x_scale, y_scale);	// if we need to reduce the model then reduce by the maximum amount
 													// if enlarging enlarge by the minimum amount
 
-			glScaled(scale, scale, scale);
+			glScaled(m_scale, m_scale, m_scale);
 		}
 
 		// calculate needed camera distance from object and move the camera
@@ -1723,6 +1715,7 @@ void COpenGLView::OnAdvancedLoadbackgroung()
 	CFileDialog dlg(TRUE, "png", "*.png", OFN_FILEMUSTEXIST | OFN_HIDEREADONLY ,szFilters);
 
 	if (dlg.DoModal () == IDOK) {
+
 		if (m_backgroundObj!=NULL)
 			delete m_backgroundObj;
 
@@ -1734,23 +1727,41 @@ void COpenGLView::OnAdvancedLoadbackgroung()
 
 		m_backgroundObj->addPTexture(sFileName.c_str(),true);
 
-		//TODO: -100 : ask slava why the object moves
-		//TODO: ask slava about prespective
 
 		int xSize = 1*(objectData->bbox.x_max - objectData->bbox.x_min);
 		int ySize = 1.6*(objectData->bbox.y_max - objectData->bbox.y_min);
 
+		int windowSize = 4;
+		int left = -windowSize*m_AspectRatio/2.0;
+		int right =  windowSize*m_AspectRatio/2.0;
+		int buttom = -windowSize/2.0;
+		int up = windowSize/2.0;
+		int z = -99*(objectData->bbox.xSize() + objectData->bbox.ySize() + objectData->bbox.zSize());
+
+		int x3=right;
+		int y3=up;
+		int z3=z;
+		int x4=left;
+		int y4=up;
+		int z4=z;
+		int x1=left;
+		int y1=buttom;
+		int z1=z;
+		int x2=right;
+		int y2=buttom;
+		int z2=z;
+
 		MyPolygon *poly = new MyPolygon(4);
-		MyVertex v1(objectData->bbox.GetCenterX()-xSize,objectData->bbox.GetCenterY()-ySize,objectData->bbox.z_min-100);
+		MyVertex v1(x1,y1,z1);
 		v1.setNormal(0,0,1);
 		v1.setUV(0,0);
-		MyVertex v2(objectData->bbox.GetCenterX()+xSize,objectData->bbox.GetCenterY()-ySize,objectData->bbox.z_min-100);
+		MyVertex v2(x2,y2,z2);
 		v2.setNormal(0,0,1);
 		v2.setUV(1,0);
-		MyVertex v3(objectData->bbox.GetCenterX()+xSize,objectData->bbox.GetCenterY()+ySize,objectData->bbox.z_min-100);
+		MyVertex v3(x3,y3,z3);
 		v3.setNormal(0,0,1);
 		v3.setUV(1,1);
-		MyVertex v4(objectData->bbox.GetCenterX()-xSize,objectData->bbox.GetCenterY()+ySize,objectData->bbox.z_min-100);
+		MyVertex v4(x4,y4,z4);
 		v4.setNormal(0,0,1);
 		v4.setUV(0,1);
 		poly->AddVertex(v1);
