@@ -447,6 +447,24 @@ BOOL COpenGLView::OnEraseBkgnd(CDC* pDC)
 /////////////////////////////////////////////////////////////////////////////
 // COpenGLView drawing
 /////////////////////////////////////////////////////////////////////////////
+#define checkImageWidth 64
+#define checkImageHeight 64
+GLubyte checkImage[checkImageHeight][checkImageWidth][3];
+
+void makeCheckImage(void)
+{
+   int i, j, c;
+   
+   for (i = 0; i < checkImageHeight; i++) {
+      for (j = 0; j < checkImageWidth; j++) {
+         c = ((((i&0x8)==0)^((j&0x8))==0))*255;
+         checkImage[i][j][0] = (GLubyte) c;
+         checkImage[i][j][1] = (GLubyte) c;
+         checkImage[i][j][2] = (GLubyte) c;
+      }
+   }
+}
+
 
 void COpenGLView::OnDraw(CDC* pDC)
 {
@@ -506,6 +524,24 @@ void COpenGLView::OnDraw(CDC* pDC)
 		glPopMatrix();
 	}
 
+	glMatrixMode(GL_PROJECTION);
+	GLdouble projMatrix[16];
+	glGetDoublev(GL_PROJECTION_MATRIX, &projMatrix[0]);
+	gluOrtho2D(0.0, (GLfloat) 20, 0.0, (GLfloat) 20);
+
+	
+	glMatrixMode(GL_MODELVIEW);
+	GLdouble viewMatrix[16];
+	glGetDoublev(GL_MODELVIEW_MATRIX, &viewMatrix[0]);
+	makeCheckImage();
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glRasterPos2i(1, 1);   
+    glDrawPixels(checkImageWidth, checkImageHeight, GL_RGB,  GL_UNSIGNED_BYTE, checkImage);
+
+	
+	glMultMatrixd(&projMatrix[0]);
+	glMultMatrixd(&viewMatrix[0]);
+    
 	glFlush();
 	SwapBuffers(wglGetCurrentDC());
 }
@@ -1466,6 +1502,7 @@ void COpenGLView::lightReset(){
 void COpenGLView::setupLightInScene(){
 
 	//Enable view lights 
+
 	GLdouble currentMatrix[16];
 	glGetDoublev(GL_MODELVIEW_MATRIX, &currentMatrix[0]);
 	glLoadIdentity();
