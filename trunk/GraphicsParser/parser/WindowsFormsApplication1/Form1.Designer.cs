@@ -51,7 +51,7 @@
             this.m_fileNameTextbox.Name = "m_fileNameTextbox";
             this.m_fileNameTextbox.Size = new System.Drawing.Size(464, 20);
             this.m_fileNameTextbox.TabIndex = 1;
-            this.m_fileNameTextbox.Text = "C:\\Users\\Hani\\Desktop\\taub.obj";
+            this.m_fileNameTextbox.Text = "C:\\Users\\Hani\\Desktop\\earth.obj";
             // 
             // button2
             // 
