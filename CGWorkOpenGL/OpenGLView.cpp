@@ -6,6 +6,8 @@
 #include "OpenGLDoc.h"
 #include "OpenGLView.h"
 
+#include <fstream>
+
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -33,6 +35,7 @@ static char THIS_FILE[] = __FILE__;
 
 #include "PngWrapper.h"
 #include "iritSkel.h"
+#include "shadersSkel.h"
 
 #define _USE_MATH_DEFINES 
 #include <cmath>
@@ -119,6 +122,8 @@ BEGIN_MESSAGE_MAP(COpenGLView, CView)
 	ON_COMMAND(ID_MATERIAL_LOADMIPMAP, &COpenGLView::OnMaterialLoadmipmap)
 	ON_COMMAND(ID_ADVANCED_LOADBACKGROUNG, &COpenGLView::OnAdvancedLoadbackgroung)
 	ON_COMMAND(ID_ADVANCED_EXPORTIMAGE, &COpenGLView::OnAdvancedExportimage)
+	ON_COMMAND(ID_ADVANCED_ADVANCEDSHADING, &COpenGLView::OnAdvancedAdvancedshading)
+	ON_UPDATE_COMMAND_UI(ID_ADVANCED_ADVANCEDSHADING, &COpenGLView::OnUpdateAdvancedAdvancedshading)
 END_MESSAGE_MAP()
 
 
@@ -141,6 +146,7 @@ COpenGLView::COpenGLView()
 	m_backgroundObj = NULL;
 	w_bbox = NULL;
 	m_showTesselation = false;
+	m_useShaders = false;
 	m_mouseSensitivity = 50;
 	m_showBoundingBox = false; 
 	m_showVertexNormals = false;
@@ -277,6 +283,17 @@ BOOL COpenGLView::InitializeOpenGL()
 	//                 ...
 	glPushMatrix();
 	glPushMatrix();
+
+	// detect if GLSL available - we can use shaders
+	CString glsl_ver_str = glGetString(0x8B8C);
+	float glsl_ver = atof(glsl_ver_str);
+	if (glsl_ver >= 1.20)
+		glsl_OK = true;
+	else
+		glsl_OK = false;
+
+	if (glsl_OK)
+		readShaders();
 
 	return TRUE;
 }
@@ -1831,4 +1848,29 @@ void COpenGLView::OnAdvancedExportimage()
 	}
 	
 	wrapper.WritePng();
+}
+
+void COpenGLView::OnAdvancedAdvancedshading()
+{
+	if (!m_useShaders) {
+		// turning on shaders
+		if (!glsl_OK) {
+			AfxMessageBox("Your version of OpenGL does not support shaders", MB_ICONEXCLAMATION);
+			return;
+		}
+
+		if (setShaders()) {
+			m_useShaders = true;
+			Invalidate();
+		}
+	} else {
+		unsetShaders();
+		m_useShaders = false;
+		Invalidate();
+	}
+}
+
+void COpenGLView::OnUpdateAdvancedAdvancedshading(CCmdUI *pCmdUI)
+{
+	pCmdUI->SetCheck(m_useShaders);
 }

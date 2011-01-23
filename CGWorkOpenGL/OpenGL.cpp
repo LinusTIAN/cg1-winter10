@@ -25,6 +25,7 @@ double	cursor_x,
 		cursor_z;
 double torch_range;
 bool torchEnabled = false;
+bool glsl_OK = false;
 
 /////////////////////////////////////////////////////////////////////////////
 // COpenGLApp
