@@ -124,6 +124,8 @@ BEGIN_MESSAGE_MAP(COpenGLView, CView)
 	ON_COMMAND(ID_ADVANCED_EXPORTIMAGE, &COpenGLView::OnAdvancedExportimage)
 	ON_COMMAND(ID_ADVANCED_ADVANCEDSHADING, &COpenGLView::OnAdvancedAdvancedshading)
 	ON_UPDATE_COMMAND_UI(ID_ADVANCED_ADVANCEDSHADING, &COpenGLView::OnUpdateAdvancedAdvancedshading)
+	ON_UPDATE_COMMAND_UI(ID_ADVANCED_CELSHADING, &COpenGLView::OnUpdateAdvancedCelshading)
+	ON_COMMAND(ID_ADVANCED_CELSHADING, &COpenGLView::OnAdvancedCelshading)
 END_MESSAGE_MAP()
 
 
@@ -147,6 +149,7 @@ COpenGLView::COpenGLView()
 	w_bbox = NULL;
 	m_showTesselation = false;
 	m_useShaders = false;
+	m_celShading = false;
 	m_mouseSensitivity = 50;
 	m_showBoundingBox = false; 
 	m_showVertexNormals = false;
@@ -285,9 +288,9 @@ BOOL COpenGLView::InitializeOpenGL()
 	glPushMatrix();
 
 	// detect if GLSL available - we can use shaders
-	CString glsl_ver_str = glGetString(0x8B8C);
-	float glsl_ver = atof(glsl_ver_str);
-	if (glsl_ver >= 1.20)
+	CString gl_ver_str = glGetString(GL_VERSION);
+	float gl_ver = atof(gl_ver_str);
+	if (gl_ver >= 2.05)
 		glsl_OK = true;
 	else
 		glsl_OK = false;
@@ -1873,4 +1876,19 @@ void COpenGLView::OnAdvancedAdvancedshading()
 void COpenGLView::OnUpdateAdvancedAdvancedshading(CCmdUI *pCmdUI)
 {
 	pCmdUI->SetCheck(m_useShaders);
+}
+
+void COpenGLView::OnUpdateAdvancedCelshading(CCmdUI *pCmdUI)
+{
+	m_celShading = m_useShaders && m_celShading;	// in case shaders were turned off, we wish to turn this off also
+
+	pCmdUI->Enable(m_useShaders);
+	pCmdUI->SetCheck(m_celShading);
+}
+
+void COpenGLView::OnAdvancedCelshading()
+{
+	m_celShading = !m_celShading;
+	setCelShading(m_celShading);
+	Invalidate();
 }

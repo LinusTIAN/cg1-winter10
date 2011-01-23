@@ -16,6 +16,9 @@ void readShaders();
 /* Returns true on success, false on failure. */
 bool setShaders();
 
+/* Return to fixed-pipeline behaviour */
 void unsetShaders();
+
+void setCelShading(bool enable);
 
 #endif //___SHADERSSKEL_H___

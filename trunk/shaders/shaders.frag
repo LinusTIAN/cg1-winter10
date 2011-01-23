@@ -2,10 +2,15 @@ varying vec4 diffuse, ambient, ambientGlobal, eyeVec;
 varying vec3 normal, lightDir;
 varying float dist;
 uniform sampler2D tex;	// texture sampler
+uniform bool celShade;
+
+const float cel_quantum = 0.25;
+const float cel_ambient_bias = 0.02;
 
 /* Do lighting calculation with light 0, assuming it is a directional light. */
-vec4 directional_light() {
-	vec4 color = ambient;
+void directional_light(out vec4 diffColor, out vec4 specColor) {
+	diffColor = ambient;
+	specColor = vec4(0,0,0,1);
 	
 	vec3 n = normalize(normal);
 	vec3 l = normalize(lightDir);
@@ -14,18 +19,17 @@ vec4 directional_light() {
 	if (NdotL > 0.0) {
 		vec3 r = -reflect(l, n);
 		float RdotEye = max(dot(r, normalize(eyeVec.xyz)), 0.0);
-		color += gl_FrontMaterial.specular * gl_LightSource[0].specular *
-				 pow(RdotEye, gl_FrontMaterial.shininess);
-		color += diffuse * NdotL;
+		specColor = gl_FrontMaterial.specular * gl_LightSource[0].specular *
+				 	pow(RdotEye, gl_FrontMaterial.shininess);
+		diffColor += diffuse * NdotL;
 	}
-
-	return color;
 }
 
 /* Do lighting calculation with light 0, assuming it is a point or spot light
    (a point light in OpenGL is a spot-light with the cutoff angle set to 180!). */
-vec4 point_spot_light() {
-	vec4 color = ambientGlobal;
+void point_spot_light(out vec4 diffColor, out vec4 specColor) {
+	diffColor = ambientGlobal;
+	specColor = vec4(0,0,0,1);
 	
 	vec3 n = normalize(normal);
 	vec3 l = normalize(lightDir);
@@ -41,42 +45,43 @@ vec4 point_spot_light() {
 									  gl_LightSource[0].linearAttenuation * dist +
 									  gl_LightSource[0].quadraticAttenuation * dist * dist);
 				
-			color += att * (diffuse * NdotL + ambient);
+			diffColor += att * (diffuse * NdotL + ambient);
 
 			vec3 r = -reflect(l, n);
 			float RdotEye = max(dot(r, normalize(eyeVec.xyz)), 0.0);
-			color += att * gl_FrontMaterial.specular * gl_LightSource[0].specular *
-					 pow(RdotEye, gl_FrontMaterial.shininess);
+			specColor = att * gl_FrontMaterial.specular * gl_LightSource[0].specular *
+					 	pow(RdotEye, gl_FrontMaterial.shininess);
 		}
 	}
-
-	return color;
 }
 
-/* Quantify an intensity into discrete intensity bands. Use for cel-shading effect */
-vec4 quantify(vec4 i) {
-	const float quantum = 0.333333;
-
+/* Quantize an intensity into discrete intensity bands. Use for cel-shading effect */
+vec4 quantize(vec4 i) {
 	float min_i = min(i.r, i.g);
 		  min_i = min(min_i, i.b);
 	float max_i = max(i.r, i.g);
 		  max_i = max(max_i, i.b);
 	float lightness = (min_i + max_i) / 2.0;
 	
-	float quantified = lightness - mod(lightness, quantum);
+	float quantified = lightness - mod(lightness,  cel_quantum) + cel_ambient_bias;
 	
 	return vec4(quantified, quantified, quantified, i.a);
 }
 
 void main()
 {
-	vec4 intensity;
+	vec4 diff, spec;
 
 	if (gl_LightSource[0].position.w == 0.0)
-		intensity = directional_light();
+		directional_light(diff, spec);
 	else
-		intensity = point_spot_light();
+		point_spot_light(diff, spec);
+		
+	if (celShade) {
+		diff = quantize(diff);
+		spec = quantize(spec);
+	}
 	
 	vec4 texel = texture2D(tex, gl_TexCoord[0].st);
-	gl_FragColor = /*vec4(texel.rgb, 1) * */intensity * gl_Color;
+	gl_FragColor = texel * diff*gl_Color + spec;
 }

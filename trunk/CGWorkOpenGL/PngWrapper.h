@@ -27,19 +27,19 @@ class PngWrapper
 public:
     PngWrapper(const char * name,int width =0,int height =0);
     PngWrapper();
-    ~PngWrapper();
-    void SetFileName(const char * name);
-    void SetWidth(int width);
-    void SetHeight(int height);
-    int GetWidth();
-    int GetHeight();
-    void SetValue(unsigned int x,unsigned int y,unsigned int value);
-    int GetValue(unsigned int x,unsigned int y);
-    int GetNumChannels();
-    int GetBPP();
-    bool ReadPng();
-    bool InitWritePng();
-    bool WritePng();
+    virtual ~PngWrapper();
+    virtual void SetFileName(const char * name);
+    virtual void SetWidth(int width);
+    virtual void SetHeight(int height);
+    virtual int GetWidth();
+    virtual int GetHeight();
+    virtual void SetValue(unsigned int x,unsigned int y,unsigned int value);
+    virtual int GetValue(unsigned int x,unsigned int y);
+    virtual int GetNumChannels();
+    virtual int GetBPP();
+    virtual bool ReadPng();
+    virtual bool InitWritePng();
+    virtual bool WritePng();
 
 
 private:

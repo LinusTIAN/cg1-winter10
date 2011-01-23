@@ -14,11 +14,15 @@ static PFNGLLINKPROGRAMPROC glLinkProgram = NULL;
 static PFNGLUSEPROGRAMPROC glUseProgram = NULL;
 static PFNGLDELETESHADERPROC glDeleteShader = NULL;
 static PFNGLDELETEPROGRAMPROC glDeleteProgram = NULL;
+static PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation = NULL;
+static PFNGLUNIFORM1IPROC glUniform1i = NULL;
 
 static GLchar	**vs,
 				**fs;
 static int	vs_lines,
 			fs_lines;
+
+static GLuint Vshader, Fshader, prog;
 
 int fileToGLcharPP(char * filename, GLchar ***res)
 {
@@ -94,6 +98,8 @@ void findFunctions()
 	glDeleteProgram = (PFNGLDELETEPROGRAMPROC) wglGetProcAddress("glDeleteProgram");
 	glGetProgramiv = (PFNGLGETPROGRAMIVPROC) wglGetProcAddress("glGetProgramiv");
 	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC) wglGetProcAddress("glGetProgramInfoLog");
+	glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC) wglGetProcAddress("glGetUniformLocation");
+	glUniform1i = (PFNGLUNIFORM1IPROC) wglGetProcAddress("glUniform1i");
 
 	called = true;
 }
@@ -108,7 +114,7 @@ bool setShaders()
 	char ok[] = "No errors.\xA";
 
 	// Load fragment shader
-	GLuint Fshader = glCreateShader(GL_FRAGMENT_SHADER);
+	Fshader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(Fshader, fs_lines, (const GLchar**)fs, NULL);	
 	glCompileShader(Fshader);
 	glGetShaderiv(Fshader, GL_COMPILE_STATUS, &result);
@@ -121,7 +127,7 @@ bool setShaders()
 	}
 
 	// Load vertex shader
-	GLuint Vshader = glCreateShader(GL_VERTEX_SHADER);
+	Vshader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(Vshader, vs_lines, (const GLchar**)vs, NULL);	
 	glCompileShader(Vshader);
 	glGetShaderiv(Vshader, GL_COMPILE_STATUS, &result);
@@ -134,7 +140,7 @@ bool setShaders()
 	}
 	
 	// Now create the program
-	GLuint prog = glCreateProgram();
+	prog = glCreateProgram();
 	glAttachShader(prog, Fshader);
 	glAttachShader(prog, Vshader);
 	glLinkProgram(prog);
@@ -163,5 +169,11 @@ void unsetShaders()
 	glUseProgram(0);	// return to fixed functionality - shaders are automatically detached and both
 						// shaders and program are deleted since they were previously flagged for
 						// deletion
+}
+
+void setCelShading(bool enable)
+{
+	static GLint uniformLoc = glGetUniformLocation(prog, "celShade");
+	glUniform1i(uniformLoc, enable);
 }
 
