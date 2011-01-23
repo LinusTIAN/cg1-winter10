@@ -60,10 +60,7 @@ namespace WindowsFormsApplication1
             string fileName = m_fileNameTextbox.Text+ ".itd";
             System.IO.File.Delete(fileName);
             System.IO.File.Create(fileName).Close();
-	        //[ptexture \"door3.png\"]
-            //[OBJECT [TextureMaterial _REFPTR_ATTR_NOT_CNVRTED_] \n[ptextureStamp 0] ";
-	        // fileContent += " [PartID 0] [rgb \"255, 255, 255\"] ";
-            // fileContent += " [ptexture \"door3.png\"] ";
+            StreamWriter sw = new StreamWriter(fileName);
 
             string fileContent = "[OBJECT MyObj  \n";           
 
@@ -84,6 +81,8 @@ namespace WindowsFormsApplication1
                             fileContent += v.x.ToString() + " ";
                             fileContent += v.y.ToString() + " ";
                             fileContent += v.z.ToString() + "]\n";
+                            sw.Write(fileContent);
+                            fileContent = "";
                         }
                         fileContent += "\t]\n";
                     }
@@ -93,7 +92,6 @@ namespace WindowsFormsApplication1
             fileContent += " ] \n";               
 
 
-            StreamWriter sw = new StreamWriter(fileName);
             sw.Write(fileContent);
             sw.Close();
 
