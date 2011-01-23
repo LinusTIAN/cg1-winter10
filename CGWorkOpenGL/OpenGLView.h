@@ -62,6 +62,7 @@ private:
 	bool m_recompile;
 	bool m_showTesselation;
 	bool m_useShaders;
+	bool m_celShading;
 	double m_backgroundColor[3];
 	double m_dVal;
 	MyBoundingBox* w_bbox;
@@ -216,6 +217,8 @@ public:
 	afx_msg void OnAdvancedExportimage();
 	afx_msg void OnAdvancedAdvancedshading();
 	afx_msg void OnUpdateAdvancedAdvancedshading(CCmdUI *pCmdUI);
+	afx_msg void OnUpdateAdvancedCelshading(CCmdUI *pCmdUI);
+	afx_msg void OnAdvancedCelshading();
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp

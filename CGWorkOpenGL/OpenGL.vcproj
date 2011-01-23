@@ -521,6 +521,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MyWhiteVirtualPng.h"
+				>
+			</File>
+			<File
 				RelativePath="OpenGL.h"
 				>
 			</File>

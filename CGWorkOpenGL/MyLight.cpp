@@ -36,7 +36,7 @@ void MyLight::setupGeneralLight(bool show, LightParams& params ){
 	glEnable(GL_LIGHTING); 
 	glEnable(GL_DEPTH_TEST);
 
-	//glEnable(GL_COLOR_MATERIAL);
+	glEnable(GL_COLOR_MATERIAL);
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
 	GLfloat lmodel_ambient[] = { m_params.colorR/255.0, m_params.colorG/255.0, m_params.colorB/255.0, 1.0 };

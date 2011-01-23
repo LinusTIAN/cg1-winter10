@@ -158,7 +158,8 @@ BEGIN
     BEGIN
         MENUITEM "&Load Background Image...",   ID_ADVANCED_LOADBACKGROUNG
         MENUITEM SEPARATOR
-        MENUITEM "Advanced Shading",            ID_ADVANCED_ADVANCEDSHADING
+        MENUITEM "A&dvanced Shading",           ID_ADVANCED_ADVANCEDSHADING
+        MENUITEM "&Cel Shading",                ID_ADVANCED_CELSHADING, INACTIVE
     END
     POPUP "&Help"
     BEGIN
@@ -655,6 +656,7 @@ STRINGTABLE
 BEGIN
     ID_ADVANCED_ADVANCEDSHADING 
                             "Advanced shading (Limited to 1 light, no fog)\nAdvanced shading features"
+    ID_ADVANCED_CELSHADING  "Toggle cel-shading (Advanced Shading must be enabled)\nCel-Shading"
 END
 
 #endif    // English (U.S.) resources
