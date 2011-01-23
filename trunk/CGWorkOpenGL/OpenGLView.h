@@ -61,6 +61,7 @@ private:
 	bool m_showFaceNormals;
 	bool m_recompile;
 	bool m_showTesselation;
+	bool m_useShaders;
 	double m_backgroundColor[3];
 	double m_dVal;
 	MyBoundingBox* w_bbox;
@@ -213,6 +214,8 @@ public:
 	void ApplyMatrix(double v[3], double m[16], bool normalize = false);
 	afx_msg void OnAdvancedLoadbackgroung();
 	afx_msg void OnAdvancedExportimage();
+	afx_msg void OnAdvancedAdvancedshading();
+	afx_msg void OnUpdateAdvancedAdvancedshading(CCmdUI *pCmdUI);
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp

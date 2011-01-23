@@ -88,6 +88,7 @@ BEGIN
             MENUITEM "Light",                       ID_RESET_LIGHT
             MENUITEM "View",                        ID_RESET_VIEW
         END
+        MENUITEM "&Export Image...",            ID_ADVANCED_EXPORTIMAGE
         MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_APP_EXIT
     END
@@ -155,8 +156,9 @@ BEGIN
     END
     POPUP "&Advanced"
     BEGIN
-        MENUITEM "&Load Backgroungd Image...",  ID_ADVANCED_LOADBACKGROUNG
-        MENUITEM "&Export Image...",            ID_ADVANCED_EXPORTIMAGE
+        MENUITEM "&Load Background Image...",   ID_ADVANCED_LOADBACKGROUNG
+        MENUITEM SEPARATOR
+        MENUITEM "Advanced Shading",            ID_ADVANCED_ADVANCEDSHADING
     END
     POPUP "&Help"
     BEGIN
@@ -645,6 +647,14 @@ BEGIN
     ID_RESET_VIEW           "Reset View\nReset View"
     ID_MATERIAL_TESSELATION "Toggle Tessellation\nToggle Tessellation"
     ID_MATERIAL_LOADMIPMAP  "Load Texture for Mipmapping\nLoad Texture for Mipmapping"
+    ID_ADVANCED_LOADBACKGROUNG "Load background image\nBackground Image"
+    ID_ADVANCED_EXPORTIMAGE "Exports Image\nExport Image"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_ADVANCED_ADVANCEDSHADING 
+                            "Advanced shading (Limited to 1 light, no fog)\nAdvanced shading features"
 END
 
 #endif    // English (U.S.) resources
