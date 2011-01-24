@@ -6,7 +6,7 @@ uniform bool celShade;
 
 const float cel_quantum = 0.25;
 const float cel_ambient_bias = cel_quantum / 12.5;
-const float cel_smooth_band = cel_quantum / 15.0;
+const float cel_smooth_band = 0.01;
 
 /* Do lighting calculation with light 0, assuming it is a directional light. */
 void directional_light(out vec4 diffColor, out vec4 specColor) {
@@ -66,6 +66,7 @@ vec4 quantize(vec4 i) {
 	
 	float lower = lightness - mod(lightness, cel_quantum);
 	float upper = lower + cel_quantum;
+
 	float f = smoothstep(upper - cel_smooth_band, upper, lightness);
 	float quantified = lower + f*cel_quantum + cel_ambient_bias;
 	
