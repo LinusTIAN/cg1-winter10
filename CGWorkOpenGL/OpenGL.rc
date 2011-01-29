@@ -160,6 +160,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "A&dvanced Shading",           ID_ADVANCED_ADVANCEDSHADING
         MENUITEM "&Cel Shading",                ID_ADVANCED_CELSHADING, INACTIVE
+        MENUITEM "Draw &Outlines",              ID_ADVANCED_DRAWOUTLINES, INACTIVE
     END
     POPUP "&Help"
     BEGIN
@@ -657,6 +658,7 @@ BEGIN
     ID_ADVANCED_ADVANCEDSHADING 
                             "Advanced shading (Limited to 1 light, no fog)\nAdvanced shading features"
     ID_ADVANCED_CELSHADING  "Toggle cel-shading (Advanced Shading must be enabled)\nCel-Shading"
+    ID_ADVANCED_DRAWOUTLINES "Enable drawing object outline\nDraw outlines"
 END
 
 #endif    // English (U.S.) resources

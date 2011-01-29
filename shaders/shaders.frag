@@ -1,8 +1,13 @@
+uniform sampler2D tex;	// texture sampler
+uniform sampler2D outlineTex;
+uniform bool celShade;
+uniform int edge_shading_pass;
+uniform vec2 screenSize;
+
 varying vec4 diffuse, ambient, ambientGlobal, eyeVec;
 varying vec3 normal, lightDir;
 varying float dist;
-uniform sampler2D tex;	// texture sampler
-uniform bool celShade;
+varying float z;
 
 const float cel_quantum = 0.25;
 const float cel_ambient_bias = cel_quantum / 12.5;
@@ -73,8 +78,32 @@ vec4 quantize(vec4 i) {
 	return vec4(quantified, quantified, quantified, i.a);
 }
 
+const float min_z = 0.96;
+
+/* Called when the alternate "edge-shader" is enabled */
+void edge_shader_pass1()
+{
+	vec3 n = normalize(normal),
+		 e = normalize(eyeVec.xyz);
+	float NdotE = abs(dot(n, e));
+	
+	const float near = 0.01,
+		 		far = 1.0;
+	float linearDepth = (2.0 * near) / (far + near - gl_FragCoord.z * (far - near));
+	
+	gl_FragColor = vec4(NdotE, 0, linearDepth, 1);
+}
+
 void main()
 {
+	if (edge_shading_pass == 1) {
+		edge_shader_pass1();
+		return;
+	} else if (edge_shading_pass == 2) {
+		gl_FragColor = vec4(0,0,0,1);
+		return;
+	}
+
 	vec4 diff, spec;
 
 	if (gl_LightSource[0].position.w == 0.0)
@@ -88,5 +117,6 @@ void main()
 	}
 	
 	vec4 texel = texture2D(tex, gl_TexCoord[0].st);
+	
 	gl_FragColor = texel * diff*gl_Color + spec;
 }

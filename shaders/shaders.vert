@@ -1,6 +1,9 @@
+uniform int edge_shading_pass;
+
 varying vec4 diffuse, ambient, ambientGlobal, eyeVec;
 varying vec3 normal, lightDir, halfVector;
 varying float dist;
+varying float z;
 
 /* Do lighting calculation with light 0, assuming it is a directional light. */
 void directional_light() {
@@ -28,10 +31,25 @@ void point_spot_light() {
 	diffuse = gl_FrontMaterial.diffuse * gl_LightSource[0].diffuse;
 	ambient = gl_FrontMaterial.ambient * gl_LightSource[0].ambient;
 	ambientGlobal = gl_LightModel.ambient * gl_FrontMaterial.ambient;
-} 
+}
+
+void edge_shader()
+{
+	vec4 eyeCoords = gl_ModelViewMatrix * gl_Vertex;
+
+	gl_Position = ftransform();
+	normal = normalize(gl_NormalMatrix * gl_Normal);
+	eyeVec = -normalize(eyeCoords);
+	z = eyeCoords.z;
+}
 
 void main()
 {
+	if (edge_shading_pass != 0) {
+		edge_shader();
+		return;
+	}
+
 	if (gl_LightSource[0].position.w == 0.0)
 		directional_light();
 	else
@@ -40,5 +58,5 @@ void main()
 	eyeVec = -(gl_ModelViewMatrix * gl_Vertex);
 	gl_TexCoord[0] = gl_MultiTexCoord0;	// generate texture coordinates
 	gl_Position = ftransform();
-	gl_FrontColor = gl_BackColor = gl_Color/*vec4(0,1,0,1)*/;
+	gl_FrontColor = gl_BackColor = gl_Color;
 } 

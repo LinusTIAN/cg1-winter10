@@ -278,6 +278,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MyEdgeDetector.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MyFogPrameters.cpp"
 				>
 			</File>
@@ -482,6 +486,10 @@
 			</File>
 			<File
 				RelativePath=".\MyCompositeObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MyEdgeDetector.h"
 				>
 			</File>
 			<File

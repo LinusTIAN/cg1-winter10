@@ -112,7 +112,6 @@ void MyTextureManager::addPTexture(const char *str, bool fullPath, bool mipmap){
 
 
 void MyTextureManager::bindTexture(PngWrapper* wrapper, int level) {
-	
 	// Read the texture image
 	int imageWidth  = wrapper->GetWidth();
 	int imageHeight = wrapper->GetHeight();
