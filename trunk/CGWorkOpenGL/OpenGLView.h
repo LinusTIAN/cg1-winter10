@@ -63,6 +63,7 @@ private:
 	bool m_showTesselation;
 	bool m_useShaders;
 	bool m_celShading;
+	bool m_drawOutlines;
 	double m_backgroundColor[3];
 	double m_dVal;
 	MyBoundingBox* w_bbox;
@@ -98,6 +99,7 @@ protected:
 	BOOL SetupViewingOrthoConstAspect(void);
 
 	virtual void RenderScene();
+	virtual void Render();
 
 	bool GetFolder(string& folderpath);
 
@@ -219,6 +221,8 @@ public:
 	afx_msg void OnUpdateAdvancedAdvancedshading(CCmdUI *pCmdUI);
 	afx_msg void OnUpdateAdvancedCelshading(CCmdUI *pCmdUI);
 	afx_msg void OnAdvancedCelshading();
+	afx_msg void OnUpdateAdvancedDrawoutlines(CCmdUI *pCmdUI);
+	afx_msg void OnAdvancedDrawoutlines();
 };
 
 #ifndef _DEBUG  // debug version in OpenGLView.cpp

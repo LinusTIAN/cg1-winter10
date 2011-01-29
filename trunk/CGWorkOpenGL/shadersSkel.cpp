@@ -1,21 +1,25 @@
 #include "stdafx.h"
 #include "shadersSkel.h"
 
-static PFNGLCREATESHADERPROC glCreateShader = NULL;
-static PFNGLSHADERSOURCEPROC glShaderSource = NULL;
-static PFNGLCOMPILESHADERPROC glCompileShader = NULL;
-static PFNGLGETSHADERIVPROC glGetShaderiv = NULL;
-static PFNGLGETPROGRAMIVPROC glGetProgramiv = NULL;
-static PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = NULL;
-static PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = NULL;
-static PFNGLCREATEPROGRAMPROC glCreateProgram = NULL;
-static PFNGLATTACHSHADERPROC glAttachShader = NULL;
-static PFNGLLINKPROGRAMPROC glLinkProgram = NULL;
-static PFNGLUSEPROGRAMPROC glUseProgram = NULL;
-static PFNGLDELETESHADERPROC glDeleteShader = NULL;
-static PFNGLDELETEPROGRAMPROC glDeleteProgram = NULL;
-static PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation = NULL;
-static PFNGLUNIFORM1IPROC glUniform1i = NULL;
+PFNGLCREATESHADERPROC glCreateShader = NULL;
+PFNGLSHADERSOURCEPROC glShaderSource = NULL;
+PFNGLCOMPILESHADERPROC glCompileShader = NULL;
+PFNGLGETSHADERIVPROC glGetShaderiv = NULL;
+PFNGLGETPROGRAMIVPROC glGetProgramiv = NULL;
+PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog = NULL;
+PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog = NULL;
+PFNGLCREATEPROGRAMPROC glCreateProgram = NULL;
+PFNGLATTACHSHADERPROC glAttachShader = NULL;
+PFNGLLINKPROGRAMPROC glLinkProgram = NULL;
+PFNGLUSEPROGRAMPROC glUseProgram = NULL;
+PFNGLDELETESHADERPROC glDeleteShader = NULL;
+PFNGLDELETEPROGRAMPROC glDeleteProgram = NULL;
+PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation = NULL;
+PFNGLUNIFORM1IPROC glUniform1i = NULL;
+PFNGLUNIFORM1IVPROC glUniform1iv = NULL;
+PFNGLUNIFORM2IPROC glUniform2i = NULL;
+PFNGLUNIFORM2FPROC glUniform2f = NULL;
+PFNGLACTIVETEXTUREPROC glActiveTexture = NULL;
 
 static GLchar	**vs,
 				**fs;
@@ -24,7 +28,18 @@ static int	vs_lines,
 
 static GLuint Vshader, Fshader, prog;
 
-int fileToGLcharPP(char * filename, GLchar ***res)
+static GLint uniCelLoc = -1,
+			 uniEdgePassLoc = -1,
+			 uniScreenSizeLoc = -1;
+
+void readyUniforms()
+{
+	uniCelLoc = glGetUniformLocation(prog, "celShade");
+	uniEdgePassLoc = glGetUniformLocation(prog, "edge_shading_pass");
+	uniScreenSizeLoc = glGetUniformLocation(prog, "screenSize");
+}
+
+static int fileToGLcharPP(char * filename, GLchar ***res)
 {
 	string * strp = NULL;
 	string str;
@@ -66,7 +81,7 @@ void deleteGLcharPP(GLchar **s, int num)
 	delete[] s;
 }
 
-void readShaders() {
+static void readShaders() {
 	static bool init = false;
 
 	if (init) return;
@@ -78,13 +93,8 @@ void readShaders() {
 }
 
 // Get pointers to needed OpenGL GLSL-related functions. Idempotent - subsequent calls will return immediately
-void findFunctions()
+static void findFunctions()
 {
-	static bool called = false;
-
-	if (called)
-		return;
-
 	glGetShaderiv = (PFNGLGETSHADERIVPROC) wglGetProcAddress("glGetShaderiv");
 	glCreateShader = (PFNGLCREATESHADERPROC) wglGetProcAddress("glCreateShader");
 	glShaderSource = (PFNGLSHADERSOURCEPROC) wglGetProcAddress("glShaderSource");
@@ -100,14 +110,14 @@ void findFunctions()
 	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC) wglGetProcAddress("glGetProgramInfoLog");
 	glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC) wglGetProcAddress("glGetUniformLocation");
 	glUniform1i = (PFNGLUNIFORM1IPROC) wglGetProcAddress("glUniform1i");
-
-	called = true;
+	glUniform1iv = (PFNGLUNIFORM1IVPROC) wglGetProcAddress("glUniform1iv");
+	glUniform2i = (PFNGLUNIFORM2IPROC) wglGetProcAddress("glUniform2i");
+	glActiveTexture = (PFNGLACTIVETEXTUREPROC) wglGetProcAddress("glActiveTexture");
+	glUniform2f  = (PFNGLUNIFORM2FPROC) wglGetProcAddress("glUniform2f");
 }
 
-bool setShaders()
+static void registerShaders()
 {
-	findFunctions();
-	
 	GLint result;
 	GLchar info_log[2048];
 
@@ -123,7 +133,7 @@ bool setShaders()
 		CString s;
 		s.Format("Error creating fragment shader: %s", info_log);
 		AfxMessageBox(s);
-		return false;
+		return;
 	}
 
 	// Load vertex shader
@@ -136,7 +146,7 @@ bool setShaders()
 		CString s;
 		s.Format("Error creating vertex shader: %s", info_log);
 		AfxMessageBox(s);
-		return false;
+		return;
 	}
 	
 	// Now create the program
@@ -150,30 +160,71 @@ bool setShaders()
 		CString s;
 		s.Format("Error creating program: %s", info_log);
 		AfxMessageBox(s);
-		return false;
+		return;
 	}
-	glUseProgram(prog);
-	
-	// cleanup
-	glDeleteShader(Fshader);
-	glDeleteShader(Vshader);
-	glDeleteProgram(prog);
+}
 
-	return true; 
+void initShaders()
+{
+	static bool called = false;
+
+	if (called) return;
+
+	findFunctions();
+	readShaders();
+	registerShaders();
+}
+
+void setShaders()
+{
+	glUseProgram(prog);
+	readyUniforms();
 }
 
 void unsetShaders()
 {
-	findFunctions();
-
-	glUseProgram(0);	// return to fixed functionality - shaders are automatically detached and both
-						// shaders and program are deleted since they were previously flagged for
-						// deletion
+	glUseProgram(0);
 }
 
-void setCelShading(bool enable)
+void delShaders()
 {
-	static GLint uniformLoc = glGetUniformLocation(prog, "celShade");
-	glUniform1i(uniformLoc, enable);
+	glDeleteShader(Fshader);
+	glDeleteShader(Vshader);
+	glDeleteProgram(prog);
+	unsetShaders();
+
+	delete[] vs;
+	delete[] fs;
 }
 
+void selectShader(shaderType_t type, int screen_w, int screen_h)
+{
+	int celShade, edge_shading_pass;
+
+	switch (type) {
+	case SH_CEL_SHADER:
+		celShade = 1;
+		edge_shading_pass = 0;
+		break;
+	case SH_EDGE_SHADER_PASS1:
+		celShade = 0;
+		edge_shading_pass = 1;
+		break;
+	case SH_EDGE_SHADER_PASS2:
+		celShade = 0;
+		edge_shading_pass = 2;
+		break;
+	default:
+		celShade = edge_shading_pass = 0;
+		break;
+	}
+
+	glUniform1i(uniCelLoc, celShade);
+	glUniform1i(uniEdgePassLoc, edge_shading_pass);
+	//glUniform2f(uniScreenSizeLoc, screen_w, screen_h);
+	
+	//GLint loc = glGetUniformLocation(prog, "tex");
+	//glUniform1i(loc, 0);
+	//loc = glGetUniformLocation(prog, "outlineTex");
+	//glUniform1i(loc, 1);
+}

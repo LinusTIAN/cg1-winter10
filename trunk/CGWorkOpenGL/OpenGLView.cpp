@@ -22,6 +22,7 @@ using std::endl;
 #include "MaterialDlg.h"
 #include "FogDialog.h"
 #include "LoadTextureDlg.h"
+#include "MyEdgeDetector.h"
 
 #include "globals.h"
 
@@ -126,6 +127,8 @@ BEGIN_MESSAGE_MAP(COpenGLView, CView)
 	ON_UPDATE_COMMAND_UI(ID_ADVANCED_ADVANCEDSHADING, &COpenGLView::OnUpdateAdvancedAdvancedshading)
 	ON_UPDATE_COMMAND_UI(ID_ADVANCED_CELSHADING, &COpenGLView::OnUpdateAdvancedCelshading)
 	ON_COMMAND(ID_ADVANCED_CELSHADING, &COpenGLView::OnAdvancedCelshading)
+	ON_UPDATE_COMMAND_UI(ID_ADVANCED_DRAWOUTLINES, &COpenGLView::OnUpdateAdvancedDrawoutlines)
+	ON_COMMAND(ID_ADVANCED_DRAWOUTLINES, &COpenGLView::OnAdvancedDrawoutlines)
 END_MESSAGE_MAP()
 
 
@@ -150,6 +153,7 @@ COpenGLView::COpenGLView()
 	m_showTesselation = false;
 	m_useShaders = false;
 	m_celShading = false;
+	m_drawOutlines = false;
 	m_mouseSensitivity = 50;
 	m_showBoundingBox = false; 
 	m_showVertexNormals = false;
@@ -176,6 +180,8 @@ COpenGLView::COpenGLView()
 
 COpenGLView::~COpenGLView()
 {
+	if (glsl_OK)
+		delShaders();
 }
 
 
@@ -296,7 +302,7 @@ BOOL COpenGLView::InitializeOpenGL()
 		glsl_OK = false;
 
 	if (glsl_OK)
-		readShaders();
+		initShaders();
 
 	return TRUE;
 }
@@ -322,8 +328,8 @@ BOOL COpenGLView::SetupPixelFormat(PIXELFORMATDESCRIPTOR* pPFD)
 		0,                      // shift bit ignored
 		0,                      // no accumulation buffer
 		0, 0, 0, 0,             // accum bits ignored
-		16,                     // 16-bit z-buffer
-		0,                      // no stencil buffer
+		24,                     // 24-bit z-buffer
+		8,                      // 8-bit stencil buffer
 		0,                      // no auxiliary buffer
 		PFD_MAIN_PLANE,         // main layer
 		0,                      // reserved
@@ -532,8 +538,7 @@ void COpenGLView::OnDraw(CDC* pDC)
 	} 
 	else
 	{
-		glPushMatrix();   
-		RenderScene();
+		Render();
 		if (torchEnabled)
 		{
 			// draw a red point marking the center of the torch
@@ -542,7 +547,6 @@ void COpenGLView::OnDraw(CDC* pDC)
 				glVertex3d(cursor_x, cursor_y, cursor_z);
 			glEnd();
 		}
-		glPopMatrix();
 	}
     
 	glFlush();
@@ -1862,10 +1866,9 @@ void COpenGLView::OnAdvancedAdvancedshading()
 			return;
 		}
 
-		if (setShaders()) {
-			m_useShaders = true;
-			Invalidate();
-		}
+		setShaders();
+		m_useShaders = true;
+		Invalidate();
 	} else {
 		unsetShaders();
 		m_useShaders = false;
@@ -1889,6 +1892,68 @@ void COpenGLView::OnUpdateAdvancedCelshading(CCmdUI *pCmdUI)
 void COpenGLView::OnAdvancedCelshading()
 {
 	m_celShading = !m_celShading;
-	setCelShading(m_celShading);
+	selectShader(m_celShading ? SH_CEL_SHADER : SH_DEFAULT, m_WindowWidth, m_WindowHeight);
 	Invalidate();
 }
+
+void COpenGLView::OnUpdateAdvancedDrawoutlines(CCmdUI *pCmdUI)
+{
+	m_drawOutlines = m_useShaders && m_drawOutlines;	// in case shaders were turned off, we wish to turn this off also
+
+	pCmdUI->Enable(m_useShaders);
+	pCmdUI->SetCheck(m_drawOutlines);
+}
+
+void COpenGLView::OnAdvancedDrawoutlines()
+{
+	m_drawOutlines = !m_drawOutlines;
+	Invalidate();
+}
+
+void COpenGLView::Render()
+{
+	if (!m_useShaders) {
+		RenderScene();
+		return;
+	}
+
+	MyEdgeDetector e(m_WindowWidth, m_WindowHeight);
+
+	if (m_drawOutlines) {
+		// clear background to white for maximum contrast with the way the normals are rendered to color
+		glClearColor((GLclampf)1.0, (GLclampf)1.0, (GLclampf)1.0, (GLclampf)1.0);
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+		selectShader(SH_EDGE_SHADER_PASS1, m_WindowWidth, m_WindowHeight);
+		glPushMatrix();
+		RenderScene();
+		glPopMatrix();
+
+		e.detectEdges();
+
+		glClearColor((GLclampf)m_backgroundColor[0], (GLclampf)m_backgroundColor[1], (GLclampf)m_backgroundColor[2], 0.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	selectShader(m_celShading ? SH_CEL_SHADER : SH_DEFAULT, m_WindowWidth, m_WindowHeight);	// setup appropriate shader
+	glPushMatrix();
+	RenderScene();
+	glPopMatrix();
+
+	if (m_drawOutlines) {
+		// render edges in black
+		glEnable(GL_STENCIL_TEST);
+		e.stencilEdges();
+		glClear(GL_DEPTH_BUFFER_BIT);	// otherwise nothing would get drawn
+
+		selectShader(SH_EDGE_SHADER_PASS2, m_WindowWidth, m_WindowHeight);
+		glStencilFunc (GL_EQUAL, 0x1, 0x1);	// cut out everything BUT the outlines
+
+		glPushMatrix();
+		RenderScene();
+		glPopMatrix();
+
+		glDisable(GL_STENCIL_TEST);
+	}
+}
+

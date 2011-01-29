@@ -10,15 +10,45 @@
 
 using namespace std;
 
-/* Reads shader code into memory. Call once on program initialization */
-void readShaders();
+extern PFNGLCREATESHADERPROC glCreateShader;
+extern PFNGLSHADERSOURCEPROC glShaderSource;
+extern PFNGLCOMPILESHADERPROC glCompileShader;
+extern PFNGLGETSHADERIVPROC glGetShaderiv;
+extern PFNGLGETPROGRAMIVPROC glGetProgramiv;
+extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+extern PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+extern PFNGLCREATEPROGRAMPROC glCreateProgram;
+extern PFNGLATTACHSHADERPROC glAttachShader;
+extern PFNGLLINKPROGRAMPROC glLinkProgram;
+extern PFNGLUSEPROGRAMPROC glUseProgram;
+extern PFNGLDELETESHADERPROC glDeleteShader;
+extern PFNGLDELETEPROGRAMPROC glDeleteProgram;
+extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+extern PFNGLUNIFORM1IPROC glUniform1i;
+extern PFNGLUNIFORM2IPROC glUniform2i;
+extern PFNGLACTIVETEXTUREPROC glActiveTexture;
+
+typedef enum shaderType_t {
+	SH_DEFAULT,
+	SH_CEL_SHADER,
+	SH_EDGE_SHADER_PASS1,
+	SH_EDGE_SHADER_PASS2
+} shaderType_t;
+
+/* Set shader uniform variables to enable selected shading behavior */
+void selectShader(shaderType_t type, int screen_w, int screen_h);
+
+/* Perform shader initializations. Call once on program start if you wish to use shaders
+   later on */
+void initShaders();
 
 /* Returns true on success, false on failure. */
-bool setShaders();
+void setShaders();
+
+/* Delete shaders. Call once before exiting the program. */
+void delShaders();
 
 /* Return to fixed-pipeline behaviour */
 void unsetShaders();
-
-void setCelShading(bool enable);
 
 #endif //___SHADERSSKEL_H___
