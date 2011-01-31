@@ -663,7 +663,6 @@ void COpenGLView::RenderScene() {
 			objectData->recompileAll();
 			m_recompile = false;
 		}
-		
 
 		glCallList( objectData->GetDisplayList(MyCompositeObject::SELECT_OPAQUE) );
 		glDepthMask(GL_FALSE);	// make z-buffer read-only for rendering transparent objects
@@ -683,18 +682,27 @@ void COpenGLView::RenderScene() {
 		}
 
 		if (m_backgroundObj != NULL){
+			GLfloat allBright[] = {1.0, 1.0, 1.0, 1.0};
+			glLightModelfv(GL_LIGHT_MODEL_AMBIENT, allBright);
+			glDisable(GL_LIGHT0);
+
 			int oldView = m_nView;
 			OnViewOrthographic();
 
-			GLdouble currentMatrix[16];
-			glGetDoublev(GL_MODELVIEW_MATRIX, &currentMatrix[0]);
+			glPushMatrix();
 			glLoadIdentity();
+
+			if (m_useShaders)
+				selectShader(SH_DRAW_BG, m_WindowWidth, m_WindowHeight);
 			m_backgroundObj->Draw();
-			glMultMatrixd(&currentMatrix[0]);
+			if (m_useShaders)
+				selectShader(m_celShading ? SH_CEL_SHADER : SH_DEFAULT, m_WindowWidth, m_WindowHeight);
+			
+			glPopMatrix();
+
 			if (m_nView != oldView)
 				OnViewPerspective();;
 			m_nView = oldView;
-			
 		}
 	}
 
@@ -1794,7 +1802,7 @@ void COpenGLView::OnAdvancedLoadbackgroung()
 		poly->AddVertex(v4);
 		m_backgroundObj->AddPolyRef(poly);
 		
-		m_recompile = true;
+		//m_recompile = true;
 		Invalidate();
 	}
 }
@@ -1919,6 +1927,9 @@ void COpenGLView::Render()
 
 	MyEdgeDetector e(m_WindowWidth, m_WindowHeight);
 
+	My3dObject *saveBG = m_backgroundObj;
+	m_backgroundObj = NULL;
+
 	if (m_drawOutlines) {
 		// clear background to white for maximum contrast with the way the normals are rendered to color
 		glClearColor((GLclampf)1.0, (GLclampf)1.0, (GLclampf)1.0, (GLclampf)1.0);
@@ -1937,6 +1948,7 @@ void COpenGLView::Render()
 
 	selectShader(m_celShading ? SH_CEL_SHADER : SH_DEFAULT, m_WindowWidth, m_WindowHeight);	// setup appropriate shader
 	glPushMatrix();
+	m_backgroundObj = saveBG;
 	RenderScene();
 	glPopMatrix();
 

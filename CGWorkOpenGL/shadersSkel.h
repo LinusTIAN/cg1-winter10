@@ -32,7 +32,8 @@ typedef enum shaderType_t {
 	SH_DEFAULT,
 	SH_CEL_SHADER,
 	SH_EDGE_SHADER_PASS1,
-	SH_EDGE_SHADER_PASS2
+	SH_EDGE_SHADER_PASS2,
+	SH_DRAW_BG
 } shaderType_t;
 
 /* Set shader uniform variables to enable selected shading behavior */

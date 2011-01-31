@@ -3,6 +3,7 @@ uniform sampler2D outlineTex;
 uniform bool celShade;
 uniform int edge_shading_pass;
 uniform vec2 screenSize;
+uniform int noLighting;
 
 varying vec4 diffuse, ambient, ambientGlobal, eyeVec;
 varying vec3 normal, lightDir;
@@ -118,5 +119,8 @@ void main()
 	
 	vec4 texel = texture2D(tex, gl_TexCoord[0].st);
 	
-	gl_FragColor = texel * diff*gl_Color + spec;
+	if (edge_shading_pass == 3)
+		gl_FragColor = texel * gl_Color;
+	else
+		gl_FragColor = texel * diff*gl_Color + spec;
 }

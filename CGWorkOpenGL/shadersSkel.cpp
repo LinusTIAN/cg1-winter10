@@ -30,13 +30,15 @@ static GLuint Vshader, Fshader, prog;
 
 static GLint uniCelLoc = -1,
 			 uniEdgePassLoc = -1,
-			 uniScreenSizeLoc = -1;
+			 uniScreenSizeLoc = -1,
+			 uniNoLightLoc = -1;
 
 void readyUniforms()
 {
 	uniCelLoc = glGetUniformLocation(prog, "celShade");
 	uniEdgePassLoc = glGetUniformLocation(prog, "edge_shading_pass");
 	uniScreenSizeLoc = glGetUniformLocation(prog, "screenSize");
+	uniNoLightLoc = glGetUniformLocation(prog, "noLighting");
 }
 
 static int fileToGLcharPP(char * filename, GLchar ***res)
@@ -199,26 +201,35 @@ void delShaders()
 
 void selectShader(shaderType_t type, int screen_w, int screen_h)
 {
-	int celShade, edge_shading_pass;
+	int celShade, edge_shading_pass, noLighting;
 
 	switch (type) {
 	case SH_CEL_SHADER:
 		celShade = 1;
 		edge_shading_pass = 0;
+		noLighting = 0;
 		break;
 	case SH_EDGE_SHADER_PASS1:
 		celShade = 0;
 		edge_shading_pass = 1;
+		noLighting = 0;
 		break;
 	case SH_EDGE_SHADER_PASS2:
 		celShade = 0;
 		edge_shading_pass = 2;
+		noLighting = 0;
+		break;
+	case SH_DRAW_BG:
+		celShade = 0;
+		edge_shading_pass = 3;
+		noLighting = 1;
 		break;
 	default:
-		celShade = edge_shading_pass = 0;
+		celShade = edge_shading_pass = noLighting = 0;
 		break;
 	}
 
+	glUniform1i(uniNoLightLoc, noLighting);
 	glUniform1i(uniCelLoc, celShade);
 	glUniform1i(uniEdgePassLoc, edge_shading_pass);
 	//glUniform2f(uniScreenSizeLoc, screen_w, screen_h);
